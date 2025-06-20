@@ -62,6 +62,13 @@ class Game {
         }
     }
 
+    moveBlob(p: Vec2): void {
+        let mrBlob = this.getCell(this.blobPos).entity;
+        this.getCell(this.blobPos).entity = undefined;
+        this.blobPos = p;
+        this.getCell(this.blobPos).entity = mrBlob;
+    }
+
 
     /**
      * Push the blobChar in the specified direction, modifying the grid along the way.
@@ -72,10 +79,7 @@ class Game {
             let nextPos = directionStep(this.blobPos, dir);
             let nextCell = this.getCell(nextPos);
             if (nextCell.tile?.enterable(dir) ?? true) { // short circuit to true if no tile
-                let mrBlob = this.getCell(this.blobPos).entity;
-                this.getCell(this.blobPos).entity = undefined;
-                this.blobPos = nextPos;
-                this.getCell(this.blobPos).entity = mrBlob;
+                this.moveBlob(nextPos)
                 continue;
             } else {
                 break;
