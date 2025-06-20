@@ -69,6 +69,18 @@ class Game {
         this.getCell(this.blobPos).entity = mrBlob;
     }
 
+    /**
+     * Moves an entity from-to and returns to for convenience
+     * @param from 
+     * @param to 
+     */
+    moveGeneric(from: Vec2, to: Vec2): Vec2 {
+        let mover = this.getCell(from).entity;
+        this.getCell(from).entity = undefined;
+        this.getCell(to).entity = mover;
+        return to;
+    }
+
 
     /**
      * Push the blobChar in the specified direction, modifying the grid along the way.
@@ -78,20 +90,24 @@ class Game {
         while (true){
             let nextPos = directionStep(this.blobPos, dir);
             let nextCell = this.getCell(nextPos);
+
             if (nextCell.tile || nextCell.entity) {
+
                 if (nextCell.entity) {
                     let ball: Ball = nextCell.entity;
                     // there is a ball, so we transfer momentum
-                    this.moveBlob(nextPos);
-                    this.ballImpulse(ball, dir);
+                    let pushed = this.ballImpulse(ball, nextPos, dir);
+                    if (pushed) {this.moveBlob(nextPos);}
+                    
                     break;
+
                 } else {
                     // there is a tile and no entity
                     if (!nextCell.tile?.enterable(dir)) { break; };
 
                     if (nextCell.tile instanceof Grate) {
                         this.moveBlob(nextPos);
-                        nextCell.tile = new Hole;
+                        nextCell.tile = new Hole();
                         continue;
                     }
 
@@ -100,9 +116,15 @@ class Game {
                         let extD = nextCell.tile.exitDir(dir);
                         let bouncedTile = directionStep(nextPos, extD);
                         if (this.getCell(bouncedTile).tile?.enterable(extD) ?? true ) {
+                            let b: Ball | undefined = this.getCell(bouncedTile).entity
+                            if (b) {
+                                if (!(this.ballImpulse(b, bouncedTile, extD))) {
+                                    break;
+                                }
+                            }
                             this.moveBlob(bouncedTile);
                             nextCell.tile.rotate();
-                            this.blobImpluse(extD); // TODO need to check for entities after bounce
+                            this.blobImpluse(extD);
                             break;
                         } else {
                             // couldn't bounce
@@ -123,8 +145,52 @@ class Game {
      * @param dir 
      * @returns whether or not it succeeded
      */
-    ballImpulse(ball: Ball, dir: Direction) : boolean {
-        return false;
+    ballImpulse(ball: Ball, ballPos: Vec2, dir: Direction) : boolean {
+        let moved = false;
+        while (true){
+            let nextPos = directionStep(ballPos, dir);
+            let nextCell = this.getCell(nextPos);
+
+            if (nextCell.tile || nextCell.entity) {
+
+                if (nextCell.entity) {
+                    return moved;
+                    // there is a ball or blob, so we stop
+
+                } else {
+                    // there is a tile and no entity
+                    if (!nextCell.tile?.enterable(dir)) { return moved; };
+
+                    if (nextCell.tile instanceof Grate) {
+                        console.log(ballPos)
+                        ballPos = this.moveGeneric(ballPos, nextPos);
+                        nextCell.tile = new Hole();
+                        continue;
+                    }
+
+                    if (nextCell.tile instanceof Slash || nextCell.tile instanceof Triangle) {
+                        // first we check where we bounce to
+                        let extD = nextCell.tile.exitDir(dir);
+                        let bouncedTile = directionStep(nextPos, extD);
+                        if (this.getCell(bouncedTile).tile?.enterable(extD) ?? true ) {
+                            let b: Ball | undefined = this.getCell(bouncedTile).entity
+                            if (b) { break;}
+                            ballPos = this.moveGeneric(ballPos, bouncedTile);
+                            nextCell.tile.rotate();
+                            this.ballImpulse(ball, bouncedTile, extD);
+                            break;
+                        } else {
+                            // couldn't bounce
+                            break;
+                        }
+                    }
+                }
+            } else {
+                ballPos = this.moveGeneric(ballPos, nextPos);
+            }
+            moved = true;
+        }
+        return moved;
     }
 
 }
@@ -141,6 +207,7 @@ g.placeBlob(v(3,2));
 g.grid[2][1] = {tile: new Grate()};
 g.grid[3][5] = {tile: new Slash()};
 g.grid[1][4] = {entity: new Ball()};
+g.grid[1][2] = {tile: new Grate()};
 g.displayGrid();
 
 let actions: Direction[] = ["down", "right", "up", "right", "left", "down", "left", "up"];
