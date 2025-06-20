@@ -132,6 +132,35 @@ export class Triangle extends Tile {
         }
     }
 
+        exitDir(from: Direction): Direction {
+        switch (this.facing) {
+            case "up":
+                switch (from) {
+                    case "down": return 'left';
+                    case "right": return 'up';
+                    default: throw new Error("Failed to bounce");
+                }
+            case "down":
+                switch (from) {
+                    case "up": return 'right';
+                    case "left": return 'down';
+                    default: throw new Error("Failed to bounce");
+                }
+            case "left":
+                switch (from) {
+                    case "up": return "left";
+                    case "right": return "down";
+                    default: throw new Error("Failed to bounce");
+                }
+            case "right":
+                switch (from) {
+                    case "down": return "right";
+                    case "left": return "up";
+                    default: throw new Error("Failed to bounce");
+                }
+        }
+    }
+
 
     enterable(from: Direction): boolean {
         switch (this.facing) {
@@ -159,6 +188,24 @@ export class Slash extends Tile {
             return '/';
         } else {
             return '\\';
+        }
+    }
+
+    exitDir(from: Direction): Direction {
+        if (this.facingUp) {
+            switch (from) {
+                case "up": return "right";
+                case "down": return "left";
+                case "left": return "down";
+                case "right": return "up";
+            }
+        } else {
+           switch (from) {
+                case "up": return "left";
+                case "down": return "right";
+                case "left": return "up";
+                case "right": return "down";
+            } 
         }
     }
 
