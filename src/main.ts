@@ -86,57 +86,56 @@ class Game {
      * Push the blobChar in the specified direction, modifying the grid along the way.
      * @param dir the direction blob is being pushed
      */
-    blobImpluse(dir: Direction) {
-        while (true){
+    *blobImpluse(dir: Direction): Generator<void, void, void> {
+        while (true) {
             let nextPos = directionStep(this.blobPos, dir);
             let nextCell = this.getCell(nextPos);
 
             if (nextCell.tile || nextCell.entity) {
-
                 if (nextCell.entity) {
                     let ball: Ball = nextCell.entity;
-                    // there is a ball, so we transfer momentum
-                    let pushed = this.ballImpulse(ball, nextPos, dir);
-                    if (pushed) {this.moveBlob(nextPos);}
-                    
-                    break;
-
+                    let pushed = yield* this.ballImpulse(ball, nextPos, dir);
+                    if (pushed) {
+                        this.moveBlob(nextPos);
+                        yield;
+                    }
+                    return;
                 } else {
-                    // there is a tile and no entity
-                    if (!nextCell.tile?.enterable(dir)) { break; };
+                    if (!nextCell.tile?.enterable(dir)) return;
 
                     if (nextCell.tile instanceof Grate) {
                         this.moveBlob(nextPos);
                         nextCell.tile = new Hole();
+                        yield;
                         continue;
                     }
 
                     if (nextCell.tile instanceof Slash || nextCell.tile instanceof Triangle) {
-                        // first we check where we bounce to
                         let extD = nextCell.tile.exitDir(dir);
                         let bouncedTile = directionStep(nextPos, extD);
-                        if (this.getCell(bouncedTile).tile?.enterable(extD) ?? true ) {
-                            let b: Ball | undefined = this.getCell(bouncedTile).entity
+                        if (this.getCell(bouncedTile).tile?.enterable(extD) ?? true) {
+                            let b: Ball | undefined = this.getCell(bouncedTile).entity;
                             if (b) {
-                                if (!(this.ballImpulse(b, bouncedTile, extD))) {
-                                    break;
-                                }
+                                const pushed = yield* this.ballImpulse(b, bouncedTile, extD);
+                                if (!pushed) return;
                             }
                             this.moveBlob(bouncedTile);
                             nextCell.tile.rotate();
-                            this.blobImpluse(extD);
-                            break;
+                            yield;
+                            yield* this.blobImpluse(extD);
+                            return;
                         } else {
-                            // couldn't bounce
-                            break;
+                            return;
                         }
                     }
                 }
             } else {
                 this.moveBlob(nextPos);
+                yield;
             }
         }
     }
+
 
 
     /**
@@ -145,56 +144,55 @@ class Game {
      * @param dir 
      * @returns whether or not it succeeded
      */
-    ballImpulse(ball: Ball, ballPos: Vec2, dir: Direction) : boolean {
+    *ballImpulse(ball: Ball, ballPos: Vec2, dir: Direction): Generator<void, boolean, void> {
         let moved = false;
-        while (true){
+
+        while (true) {
             let nextPos = directionStep(ballPos, dir);
             let nextCell = this.getCell(nextPos);
 
             if (nextCell.tile || nextCell.entity) {
-
                 if (nextCell.entity) {
                     return moved;
-                    // there is a ball or blob, so we stop
-
                 } else {
-                    // there is a tile and no entity
-                    if (!nextCell.tile?.enterable(dir)) { return moved; };
+                    if (!nextCell.tile?.enterable(dir)) {
+                        return moved;
+                    }
 
                     if (nextCell.tile instanceof Grate) {
-                        console.log(ballPos)
                         ballPos = this.moveGeneric(ballPos, nextPos);
                         nextCell.tile = new Hole();
+                        moved = true;
+                        yield;
                         continue;
                     }
 
                     if (nextCell.tile instanceof Slash || nextCell.tile instanceof Triangle) {
-                        // first we check where we bounce to
                         let extD = nextCell.tile.exitDir(dir);
                         let bouncedTile = directionStep(nextPos, extD);
-                        if (this.getCell(bouncedTile).tile?.enterable(extD) ?? true ) {
-                            let b: Ball | undefined = this.getCell(bouncedTile).entity
-                            if (b) { break;}
+                        if (this.getCell(bouncedTile).tile?.enterable(extD) ?? true) {
+                            let b: Ball | undefined = this.getCell(bouncedTile).entity;
+                            if (b) return moved;
+
                             ballPos = this.moveGeneric(ballPos, bouncedTile);
                             nextCell.tile.rotate();
-                            this.ballImpulse(ball, bouncedTile, extD);
-                            break;
+                            moved = true;
+                            yield;
+                            yield* this.ballImpulse(ball, bouncedTile, extD);
+                            return true;
                         } else {
-                            // couldn't bounce
-                            break;
+                            return moved;
                         }
                     }
                 }
             } else {
                 ballPos = this.moveGeneric(ballPos, nextPos);
+                moved = true;
+                yield;
             }
-            moved = true;
         }
-        return moved;
     }
-
 }
-
 
 
 
@@ -205,16 +203,19 @@ let g = new Game()
 g.grid = Game.emptyGrid(7, 9);
 g.placeBlob(v(3,2));
 g.grid[2][1] = {tile: new Grate()};
-g.grid[3][5] = {tile: new Slash()};
+g.grid[3][5] = {tile: new Triangle()};
 g.grid[1][4] = {entity: new Ball()};
 g.grid[1][2] = {tile: new Grate()};
 g.displayGrid();
 
-let actions: Direction[] = ["down", "right", "up", "right", "left", "down", "left", "up"];
+let actions: Direction[] = ["down", "right", "up", "right", "left", "left", "down"];
 
 for (let a of actions) {
     console.log("Moving " + a);
-    g.blobImpluse(a);
-    g.displayGrid();
-    console.log()
+
+    const gen = g.blobImpluse(a);
+    for (let _ of gen) {
+        g.displayGrid(); // display each step
+        console.log();
+    }
 }
