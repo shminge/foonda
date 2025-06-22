@@ -9,7 +9,7 @@
 - O hole (wall that can be filled by ball)
 - = grate (turns into hole after traversal by blob or ball)
 */
-import { Vec2, Direction, v, directionStep } from "./vectors";
+import { Vec2, Direction, v, directionStep } from "./utils";
 import { Cell, Wall, BlobChar, Entity, Ball, Grate, Hole, Slash, Triangle } from "./classes";
 
 
@@ -17,9 +17,16 @@ import { Cell, Wall, BlobChar, Entity, Ball, Grate, Hole, Slash, Triangle } from
 
 
 
-class Game {
+export class Game {
     grid: Cell[][] = []; // grid coordinates are grid[x][y]
     blobPos: Vec2 = {x: -1, y: -1}
+
+    static newGame(gr: Cell[][], bPos: Vec2): Game {
+        let g = new Game();
+        g.grid = gr;
+        g.blobPos = bPos;
+        return g;
+    }
 
     static emptyGrid(n: number, m: number = n): Cell[][] {
         let grid: Cell[][] = [];

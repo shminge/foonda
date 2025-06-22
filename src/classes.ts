@@ -1,4 +1,4 @@
-import { Direction } from "./vectors";
+import { Direction } from "./utils";
 
 export type Cell = {
     entity?: Entity;

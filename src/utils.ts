@@ -20,3 +20,17 @@ export function directionStep(pos: Vec2, dir: Direction): Vec2 {
         case "right": return v(pos.x+1, pos.y);
     }
 }
+
+
+/**
+ * random choice
+ */
+export function choice<T>(choices: T[]): T {
+    return choices[Math.floor(Math.random()*choices.length)]
+}
+
+export function rand(a:number, b:number, whole=false): number {
+    let n = Math.random()*(b-a) + a;
+    if (whole) return Math.floor(n);
+    return n;
+}
