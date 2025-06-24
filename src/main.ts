@@ -11,6 +11,7 @@
 */
 import { Vec2, Direction, v, directionStep } from "./utils";
 import { Cell, Wall, BlobChar, Entity, Ball, Grate, Hole, Slash, Triangle } from "./classes";
+import { createPuzzle, generateGrid } from "./generator";
 
 
 
@@ -25,6 +26,7 @@ export class Game {
         let g = new Game();
         g.grid = gr;
         g.blobPos = bPos;
+        g.grid[bPos.x][bPos.y].entity = new BlobChar();
         return g;
     }
 
@@ -163,6 +165,10 @@ export class Game {
                     return moved;
                 } else {
                     if (!nextCell.tile?.enterable(dir)) {
+                        if (nextCell.tile instanceof Hole && !nextCell.tile.filled) {
+                            nextCell.tile.filled = true;
+                            return true;
+                        }
                         return moved;
                     }
 
@@ -206,8 +212,14 @@ export class Game {
 /**
  * Abandon hope all ye who enter here
  */
-let g = new Game()
-g.grid = Game.emptyGrid(7, 9);
+let g = createPuzzle(10, 10);
+
+/*= new Game()
+g.grid = generateGrid(10, 10)[0];
+g.displayGrid();
+
+
+/*
 g.placeBlob(v(3,2));
 g.grid[2][1] = {tile: new Grate()};
 g.grid[3][5] = {tile: new Triangle()};
@@ -226,3 +238,4 @@ for (let a of actions) {
         console.log();
     }
 }
+    */
