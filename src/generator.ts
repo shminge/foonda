@@ -1,4 +1,4 @@
-import { choice, Direction, rand, shuffleArray, v, Vec2 } from "./utils";
+import { choice, Direction, exhaust, rand, shuffleArray, v, Vec2 } from "./utils";
 import { Game } from "./main";
 import { Ball, BlobChar, Cell, Grate, Hole, Slash, Triangle, Wall } from "./classes";
 
@@ -86,11 +86,11 @@ export function createPuzzle(n: number, m: number): Game {
     let numMoves = rand(5, 20, true);
     for (let i = 0; i < numMoves; i++) {
         let dir: Direction = choice(["up", "down", "left", "right"]);
-        g.blobImpluse(dir);
-        console.log("Moving "+ dir);
-        g.displayGrid();
-        console.log();
+        const gen = g.blobImpluse(dir);
+        exhaust(gen);
     }
+    g.displayGrid();
+    console.log();
 
 
 

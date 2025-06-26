@@ -47,3 +47,8 @@ export function shuffleArray<T>(arr: T[]): T[] {
 }
 
 
+export function exhaust(generator: Generator<any,any,any>): void {
+    for (const _ of generator) {
+    }
+}
+
