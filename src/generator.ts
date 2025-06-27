@@ -85,25 +85,42 @@ export function generateGrid(n: number, m: number, minDensity: number = 0.05, ma
 }
 
 export function createPuzzle(n: number, m: number): [Cell[][], Vec2, Vec2] {
+
+    console.clear();
+
     let [grid, startPos] = generateGrid(n, m);
     // Clone grid before creating game to avoid mutating original
     let g = Game.newGame(cloneGrid(grid), startPos);
     //g.displayGrid()
     let numMoves = rand(5, 20, true);
+
+    let moves: Direction[] = [];
     for (let i = 0; i < numMoves; i++) {
         let dir: Direction = choice(["up", "down", "left", "right"]);
 
         const gen = g.blobImpluse(dir);
+        
         exhaust(gen);
 
-        /*
-        console.log("Moving " + dir);
-        g.displayGrid();
-        console.log();
-        */
+        moves.push(dir);
+    }
+    // finally
+    let possEnds: Vec2[] = [g.blobPos];
+
+    let dir: Direction = choice(["up", "down", "left", "right"]);
+    moves.push(dir);
+
+    const gen = g.blobImpluse(dir);
+    
+    for (const _ of gen) {
+        possEnds.push(g.blobPos);
     }
 
-    return [grid, startPos, g.blobPos]; // TODO add mid-move goal support
+    let chosenEnd = choice(possEnds);
+    
+
+
+    return [grid, startPos, chosenEnd]; 
 }
 
 export function calcMin(grid: Cell[][], startPos: Vec2, endPos: Vec2): number {
@@ -125,7 +142,11 @@ export function calcMin(grid: Cell[][], startPos: Vec2, endPos: Vec2): number {
             let gclone = position.clone();
             const gen = gclone.blobImpluse(dir);
 
-            exhaust(gen);
+            //exhaust(gen);
+
+            for (const _ of gen) {
+                if (vEq(gclone.blobPos, endPos)) return numMoves + 1; // +1 because we're basing it off the previous
+            }
 
             let sg = gclone.serializeGrid();
 
@@ -135,14 +156,16 @@ export function calcMin(grid: Cell[][], startPos: Vec2, endPos: Vec2): number {
                 continue; // visited previously
             }
 
-
-            if (vEq(gclone.blobPos, endPos)) {
-                return numMoves + 1; // +1 because we're basing it off the previous
-            } else {
+            if (vEq(gclone.blobPos, endPos)){ 
+                return numMoves + 1
+            } else { 
                 stack.unshift([gclone, numMoves + 1])
             }
+            
         }
     }
+    console.log("Can't find a way on grid:")
+    Game.newGame(cloneGrid(grid), startPos).displayGrid();
     throw new Error("Unreachable end position");
 }
 

@@ -61,8 +61,13 @@ export class Game {
     }
 
     displayGrid() {
+        let initial = '  ';
+        for (let x = 0; x < this.grid.length; x++) {
+            initial += (x%10);
+        }
+        console.log(initial);
         for (let y = 0; y < this.grid[0].length; y++) {
-            let line = '';
+            let line = y + ' ';
             for (let x = 0; x < this.grid.length; x++) {
                 let cCell: Cell = this.grid[x][y];
                 line += cCell.entity?.render() ?? cCell.tile?.render() ?? '.' 

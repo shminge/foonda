@@ -54,4 +54,3 @@ export function exhaust(generator: Generator<any,any,any>): void {
     for (const _ of generator) {
     }
 }
-
