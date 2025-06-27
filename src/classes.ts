@@ -12,6 +12,7 @@ export type Cell = {
 export abstract class Entity {
     abstract kind: string;
     abstract render(): string;
+    abstract clone(): Entity;
 }
 
 export class BlobChar extends Entity {
@@ -20,6 +21,10 @@ export class BlobChar extends Entity {
     render(): string {
         return '@';
     }
+
+    clone(): BlobChar {
+        return new BlobChar();
+    }
 }
 
 export class Ball extends Entity {
@@ -27,6 +32,10 @@ export class Ball extends Entity {
 
     render(): string {
         return '*';
+    }
+
+    clone(): Ball {
+        return new Ball();
     }
 }
 
@@ -38,6 +47,7 @@ export abstract class Tile {
     abstract kind: string;
     abstract render(): string;
     abstract enterable(from: Direction): boolean;
+    abstract clone(): Tile;
 }
 
 /**
@@ -53,6 +63,10 @@ export class Wall extends Tile {
     enterable(from: Direction): boolean {
         return false;
     }
+
+    clone(): Wall {
+        return new Wall();
+    }
 }
 
 /**
@@ -67,6 +81,10 @@ export class Star extends Tile {
 
     enterable(from: Direction): boolean {
         return true;
+    }
+
+    clone(): Star {
+        return new Star();
     }
 }
 
@@ -89,6 +107,12 @@ export class Hole extends Tile {
     enterable(from: Direction): boolean {
         return this.filled;
     }
+
+    clone(): Hole {
+        const h = new Hole();
+        h.filled = this.filled;
+        return h;
+    }
 }
 
 /**
@@ -103,6 +127,10 @@ export class Grate extends Tile {
 
     enterable(from: Direction): boolean {
         return true;
+    }
+
+    clone(): Grate {
+        return new Grate();
     }
 }
 
@@ -132,7 +160,7 @@ export class Triangle extends Tile {
         }
     }
 
-        exitDir(from: Direction): Direction {
+    exitDir(from: Direction): Direction {
         switch (this.facing) {
             case "up":
                 switch (from) {
@@ -161,7 +189,6 @@ export class Triangle extends Tile {
         }
     }
 
-
     enterable(from: Direction): boolean {
         switch (this.facing) {
             case "up": return from == 'down' || from == 'right';
@@ -169,6 +196,12 @@ export class Triangle extends Tile {
             case "left": return from == 'up' || from == 'right';
             case "right": return from == 'down' || from == 'left';
         }
+    }
+
+    clone(): Triangle {
+        const t = new Triangle();
+        t.facing = this.facing;
+        return t;
     }
 }
 
@@ -181,7 +214,6 @@ export class Slash extends Tile {
     rotate(): void {
         this.facingUp = !this.facingUp;
     }
-
 
     render(): string {
         if (this.facingUp) {
@@ -211,5 +243,11 @@ export class Slash extends Tile {
 
     enterable(from: Direction): boolean {
         return true;
+    }
+
+    clone(): Slash {
+        const s = new Slash();
+        s.facingUp = this.facingUp;
+        return s;
     }
 }

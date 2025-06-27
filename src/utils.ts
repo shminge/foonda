@@ -21,6 +21,9 @@ export function directionStep(pos: Vec2, dir: Direction): Vec2 {
     }
 }
 
+export function vEq(a: Vec2, b:Vec2): boolean {
+    return (a.x == b.x && a.y == b.y)
+}
 
 /**
  * random choice

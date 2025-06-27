@@ -10,8 +10,8 @@
 - = grate (turns into hole after traversal by blob or ball)
 */
 import { Vec2, Direction, v, directionStep } from "./utils";
-import { Cell, Wall, BlobChar, Entity, Ball, Grate, Hole, Slash, Triangle } from "./classes";
-import { createPuzzle, generateGrid } from "./generator";
+import { Cell, Wall, BlobChar, Entity, Ball, Grate, Hole, Slash, Triangle, Star } from "./classes";
+import { calcMin, createPuzzle, generateGrid } from "./generator";
 
 
 
@@ -71,6 +71,36 @@ export class Game {
         }
     }
 
+    serializeGrid(): string {
+        let lines: string[] = [];
+
+        for (let y = 0; y < this.grid[0].length; y++) {
+            let line = '';
+            for (let x = 0; x < this.grid.length; x++) {
+                const cCell: Cell = this.grid[x][y];
+                line += cCell.entity?.render() ?? cCell.tile?.render() ?? '.';
+            }
+            lines.push(line);
+        }
+
+        return lines.join('\n');
+    }   
+
+    clone(): Game {
+        const newGrid: Cell[][] = this.grid.map(column =>
+            column.map(cell => ({
+                entity: cell.entity?.clone(),
+                tile: cell.tile?.clone()
+            }))
+        );
+
+        const newBlobPos = { ...this.blobPos };
+
+        return Game.newGame(newGrid, newBlobPos);
+    }
+
+
+
     moveBlob(p: Vec2): void {
         let mrBlob = this.getCell(this.blobPos).entity;
         this.getCell(this.blobPos).entity = undefined;
@@ -99,6 +129,7 @@ export class Game {
         while (true) {
             let nextPos = directionStep(this.blobPos, dir);
             let nextCell = this.getCell(nextPos);
+            //console.log("Moving "+ dir + " to " + JSON.stringify(nextPos) + " which is a " + JSON.stringify(nextCell));
 
             if (nextCell.tile || nextCell.entity) {
                 if (nextCell.entity) {
@@ -137,6 +168,15 @@ export class Game {
                             return;
                         }
                     }
+
+
+                    if (nextCell.tile instanceof Hole) {
+                        if (!nextCell.tile.filled) {
+                            throw new Error("Somehow fell in a hole")
+                        }
+                        this.moveBlob(nextPos);
+                        yield;
+                    }
                 }
             } else {
                 this.moveBlob(nextPos);
@@ -160,14 +200,20 @@ export class Game {
             let nextPos = directionStep(ballPos, dir);
             let nextCell = this.getCell(nextPos);
 
+            //console.log("Moving ball "+ dir + " to " + JSON.stringify(nextPos) + " which is a " + JSON.stringify(nextCell));
+
             if (nextCell.tile || nextCell.entity) {
                 if (nextCell.entity) {
                     return moved;
                 } else {
                     if (!nextCell.tile?.enterable(dir)) {
-                        if (nextCell.tile instanceof Hole && !nextCell.tile.filled) {
-                            nextCell.tile.filled = true;
-                            return true;
+                        if (nextCell.tile instanceof Hole) {
+                            if (!nextCell.tile.filled) {
+                                nextCell.tile.filled = true;
+                                this.getCell(v(ballPos.x, ballPos.y)).entity = undefined;
+                                return true;
+                            } 
+                            
                         }
                         return moved;
                     }
@@ -175,6 +221,13 @@ export class Game {
                     if (nextCell.tile instanceof Grate) {
                         ballPos = this.moveGeneric(ballPos, nextPos);
                         nextCell.tile = new Hole();
+                        moved = true;
+                        yield;
+                        continue;
+                    }
+
+                    if (nextCell.tile instanceof Hole && nextCell.tile.filled) {
+                        ballPos = this.moveGeneric(ballPos, nextPos);
                         moved = true;
                         yield;
                         continue;
@@ -212,7 +265,19 @@ export class Game {
 /**
  * Abandon hope all ye who enter here
  */
-let g = createPuzzle(10, 10);
+
+let nm = 0;
+let g: [Cell[][], Vec2, Vec2];
+while (nm < 5) {
+    g = createPuzzle(10, 10);
+    nm = (calcMin(...g));
+}
+let ng = Game.newGame(g![0], g![1]);
+ng.displayGrid();
+console.log("Get to the % in "+ nm + " moves!")
+ng.grid[g![2].x][g![2].y].tile = new Star;
+ng.displayGrid();
+
 
 /*= new Game()
 g.grid = generateGrid(10, 10)[0];
