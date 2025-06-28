@@ -86,7 +86,6 @@ export function generateGrid(n: number, m: number, minDensity: number = 0.05, ma
 
 export function createPuzzle(n: number, m: number): [Cell[][], Vec2, Vec2] {
 
-    console.clear();
 
     let [grid, startPos] = generateGrid(n, m);
     // Clone grid before creating game to avoid mutating original

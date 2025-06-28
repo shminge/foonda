@@ -12,6 +12,7 @@
 import { Vec2, Direction, v, directionStep } from "./utils";
 import { Cell, Wall, BlobChar, Entity, Ball, Grate, Hole, Slash, Triangle, Star } from "./classes";
 import { calcMin, createPuzzle, generateGrid } from "./generator";
+import * as readline from 'readline';
 
 
 
@@ -155,6 +156,12 @@ export class Game {
                         continue;
                     }
 
+                    if (nextCell.tile instanceof Star) {
+                        this.moveBlob(nextPos);
+                        yield;
+                        return;
+                    }
+
                     if (nextCell.tile instanceof Slash || nextCell.tile instanceof Triangle) {
                         let extD = nextCell.tile.exitDir(dir);
                         let bouncedTile = directionStep(nextPos, extD);
@@ -238,6 +245,13 @@ export class Game {
                         continue;
                     }
 
+                    if (nextCell.tile instanceof Star) {
+                        ballPos = this.moveGeneric(ballPos, nextPos);
+                        moved = true;
+                        yield;
+                        continue;
+                    }
+
                     if (nextCell.tile instanceof Slash || nextCell.tile instanceof Triangle) {
                         let extD = nextCell.tile.exitDir(dir);
                         let bouncedTile = directionStep(nextPos, extD);
@@ -263,6 +277,51 @@ export class Game {
             }
         }
     }
+
+
+
+    play(target: number): void {
+        const rl = readline.createInterface({
+            input: process.stdin,
+            output: process.stdout
+        });
+
+        let playInstance = this.clone();
+
+        const validDirections: Direction[] = ["up", "down", "left", "right"];
+
+        const promptInput = (n: number) => {
+            rl.question("[Move "+ n +"/"+ target+"]: ", (userInput: string) => {
+                const input = userInput.trim().toLowerCase();
+
+                if (input === 'quit') {
+                    rl.close();
+                    return;
+                } else if (input === 'reset') {
+                    playInstance = this.clone();
+                    playInstance.displayGrid();
+                    promptInput(1);
+                    return;
+                } else if (validDirections.includes(input as Direction)) {
+                    const gen = playInstance.blobImpluse(input as Direction);
+                    for (const _ of gen) {
+                        playInstance.displayGrid();
+                        console.log();
+                    }
+                    promptInput(n+1);
+                    return;
+                } else {
+                    console.log("Invalid input. Try again.");
+                    promptInput(n);
+                    return;
+                }
+            });
+        };
+
+        playInstance.displayGrid();
+        promptInput(1);
+    }
+
 }
 
 
@@ -273,15 +332,15 @@ export class Game {
 
 let nm = 0;
 let g: [Cell[][], Vec2, Vec2];
-while (nm < 5) {
+while (nm < 6) {
     g = createPuzzle(10, 10);
     nm = (calcMin(...g));
 }
 let ng = Game.newGame(g![0], g![1]);
-ng.displayGrid();
 console.log("Get to the % in "+ nm + " moves!")
 ng.grid[g![2].x][g![2].y].tile = new Star;
-ng.displayGrid();
+//ng.displayGrid();
+ng.play(nm);
 
 
 /*= new Game()
