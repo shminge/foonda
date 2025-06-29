@@ -170,8 +170,10 @@ export class Game {
                             if (b) {
                                 const pushed = yield* this.ballImpulse(b, bouncedTile, extD);
                                 if (!pushed) return;
+                                this.moveBlob(bouncedTile);
+                                return;
                             }
-                            this.moveBlob(bouncedTile);
+                            this.moveBlob(nextPos);
                             nextCell.tile.rotate();
                             yield;
                             yield* this.blobImpluse(extD);
@@ -196,6 +198,8 @@ export class Game {
             }
         }
     }
+
+
 
 
 
@@ -259,7 +263,7 @@ export class Game {
                             let b: Ball | undefined = this.getCell(bouncedTile).entity;
                             if (b) return moved;
 
-                            ballPos = this.moveGeneric(ballPos, bouncedTile);
+                            ballPos = this.moveGeneric(ballPos, nextPos);
                             nextCell.tile.rotate();
                             moved = true;
                             yield;
@@ -332,7 +336,7 @@ export class Game {
 
 let nm = 0;
 let g: [Cell[][], Vec2, Vec2];
-while (nm < 6) {
+while (nm < 10) {
     g = createPuzzle(10, 10);
     nm = (calcMin(...g));
 }
