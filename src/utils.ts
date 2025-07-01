@@ -25,29 +25,66 @@ export function vEq(a: Vec2, b:Vec2): boolean {
     return (a.x == b.x && a.y == b.y)
 }
 
+function mulberry32(seed: number) {
+  return function() {
+    let t = seed += 0x6D2B79F5;
+    t = Math.imul(t ^ t >>> 15, t | 1);
+    t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  }
+}
+
+function stringToSeed(str: string) {
+  let h = 2166136261 >>> 0; // FNV-1a 32-bit offset basis
+  for (let i = 0; i < str.length; i++) {
+    h ^= str.charCodeAt(i);
+    h = Math.imul(h, 16777619); // FNV prime
+  }
+  return h >>> 0;
+}
+
+
+export class _RNG {
+    gen: () => number;
+
+    constructor(seed: string) {
+        this.gen = mulberry32(stringToSeed(seed));
+    }
+
+    nrand() {
+        return this.gen();
+    }
+
+    choice<T>(choices: T[]) {
+        return choices[Math.floor(this.nrand()*choices.length)]
+    }
+
+    rand(a:number, b:number, whole=false): number {
+        let n = this.nrand()*(b-a) + a;
+        if (whole) return Math.floor(n);
+        return n;
+    }
+
+    shuffleArray<T>(arr: T[]): T[] {
+        for (let i = arr.length - 1; i > 0; i--) {
+            // Generate a random index from 0 to i
+            const j = Math.floor(this.nrand() * (i + 1));
+            
+            // Swap elements at index i and j
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+}
+
+
+
 /**
  * random choice
  */
-export function choice<T>(choices: T[]): T {
-    return choices[Math.floor(Math.random()*choices.length)]
-}
 
-export function rand(a:number, b:number, whole=false): number {
-    let n = Math.random()*(b-a) + a;
-    if (whole) return Math.floor(n);
-    return n;
-}
 
-export function shuffleArray<T>(arr: T[]): T[] {
-    for (let i = arr.length - 1; i > 0; i--) {
-        // Generate a random index from 0 to i
-        const j = Math.floor(Math.random() * (i + 1));
-        
-        // Swap elements at index i and j
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-    }
-    return arr;
-}
+
 
 
 export function exhaust(generator: Generator<any,any,any>): void {

@@ -5,64 +5,115 @@ window.draw = draw;
 window.preload = preload;
 window.keyPressed = keyPressed;
 
-
 var canvasSize = 500;
-
 var isMoving = false;
-
 var spriteSheet;
 var sprites = {};
 var resetPoint;
-
-
 var game;
 var minMoves;
 var numMoves = 0;
-
 var spriteScale;
 var xAnchor;
 var yAnchor;
-
 var xsize = 10;
 var ysize = 10;
+var currentSeed = "";
+
+// Get today's date in dd/mm/yyyy format
+function getTodaysDate() {
+    const today = new Date();
+    const day = String(today.getDate()).padStart(2, '0');
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const year = today.getFullYear();
+    return `${day}/${month}/${year}`;
+}
+
+// Expose variables to global scope for HTML access
+window.gameState = {
+    get numMoves() { return numMoves; },
+    get minMoves() { return minMoves; },
+    get currentSeed() { return currentSeed; }
+};
+
+function updateHTML() {
+    // Update the HTML elements with current values
+    const movesElement = document.getElementById('moves');
+    const targetElement = document.getElementById('target');
+    const seedElement = document.getElementById('seed-display');
+    
+    if (movesElement) movesElement.textContent = numMoves;
+    if (targetElement) targetElement.textContent = minMoves;
+    if (seedElement) seedElement.textContent = currentSeed;
+}
+
+function setupSeedControls() {
+    const seedButton = document.getElementById('seed-button');
+    const seedInput = document.getElementById('seed-input');
+    
+    if (seedButton && seedInput) {
+        seedButton.addEventListener('click', () => {
+            const newSeed = seedInput.value.trim() || getTodaysDate();
+            game = undefined;
+            draw();
+            loadNewGame(newSeed);
+            seedInput.value = ''; // Clear the input
+        });
+        
+        // Allow Enter key to trigger new game
+        seedInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                seedButton.click();
+            }
+        });
+    }
+}
+
+function loadNewGame(seed = null) {
+    currentSeed = seed || getTodaysDate();
+    [game, minMoves] = setupGame(xsize, ysize, 'medium', currentSeed);
+    resetPoint = game.clone();
+    numMoves = 0;
+    updateHTML();
+    draw();
+}
 
 function preload() {
     spriteSheet = loadImage("foondatiles.png");
 }
 
-function loadGame() {
-    return setupGame(xsize, ysize, 5);
-}
-
 
 function setup() {
-  createCanvas(canvasSize, canvasSize);
-  noSmooth();
+    // Create canvas in the container div
+    const canvas = createCanvas(canvasSize, canvasSize);
+    canvas.parent('canvas-container');
+    noSmooth();
 
-  const spriteNames = ["bg1","bg2","wall","blob","star","slash", "backslash", "dl", "dr", "ur", "ul", "ball", "hole", "grate", "filled"];
+    const spriteNames = ["bg1","bg2","wall","blob","star","slash", "backslash", "dl", "dr", "ur", "ul", "ball", "hole", "grate", "filled"];
 
-  for (let i = 0; i < spriteNames.length; i++) {
-    const y = i*32;
-    const sprite = spriteSheet.get(0,y,32,32);
-    sprites[spriteNames[i]] = sprite;
-  }
+    for (let i = 0; i < spriteNames.length; i++) {
+        const y = i*32;
+        const sprite = spriteSheet.get(0,y,32,32);
+        sprites[spriteNames[i]] = sprite;
+    }
 
-  [game, minMoves] = loadGame();
-  resetPoint = game.clone();
-  
-  let longer = max(xsize, ysize);
-  spriteScale = canvasSize/longer;
-  xAnchor = canvasSize/2 - (spriteScale*xsize/2);
-  yAnchor = canvasSize/2 - (spriteScale*ysize/2);
+    // Initialize with today's date as default seed
+    loadNewGame();
+    
+    let longer = max(xsize, ysize);
+    spriteScale = canvasSize/longer;
+    xAnchor = canvasSize/2 - (spriteScale*xsize/2);
+    yAnchor = canvasSize/2 - (spriteScale*ysize/2);
 
-  noLoop();
+    // Setup seed controls after DOM is ready
+    setupSeedControls();
+    
+    noLoop();
 }
-
 
 function place(sprname, x, y) {
     image(sprites[sprname], xAnchor + x*spriteScale, yAnchor + y*spriteScale, spriteScale, spriteScale);
 }
-
 
 function drawChecker() {
     for (let x = 0; x < xsize; x++) {
@@ -116,29 +167,28 @@ function drawGame() {
                     place('ball', x, y);
                 }
             }
-            
-            }
         }
     }
-
-
-
-
-function draw() {
-  drawChecker();
-  drawGame();
-  noLoop();
 }
 
-
+function draw() {
+    if (game) {
+        drawChecker();
+        drawGame();
+    } else {
+        background(255);
+    }
+    noLoop();
+}
 
 function keyPressed() {
     if (key === 'r') {
         game = resetPoint.clone();
+        numMoves = 0; // Reset move counter
+        updateHTML(); // Update HTML display
         draw();
         return
     }
-
 
     let gen;
     if (keyCode === UP_ARROW) {
@@ -155,10 +205,10 @@ function keyPressed() {
     }
     if (gen && !isMoving) {
         numMoves += 1;
+        updateHTML(); // Update HTML when moves change
         isMoving = true;
         animateMovement(gen);
     }
-
 }
 
 function animateMovement(generator) {

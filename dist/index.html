@@ -4,8 +4,101 @@
   <meta charset="UTF-8" />
   <title>p5.js + TypeScript Interop</title>
   <script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 0;
+      padding: 20px;
+      background-color: #f0f0f0;
+    }
+    
+    #game-info {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      font-size: 18px;
+      text-align: center;
+      min-width: 200px;
+    }
+    
+    .info-line {
+      margin: 5px 0;
+    }
+    
+    #canvas-container {
+      border: 2px solid #333;
+      border-radius: 8px;
+      overflow: hidden;
+      width: 500px;
+      height: 500px;
+      background-color: #ddd;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    #seed-controls {
+      margin-top: 15px;
+      padding: 15px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      text-align: center;
+      min-width: 200px;
+    }
+    
+    #seed-input {
+      padding: 8px 12px;
+      font-size: 16px;
+      border: 2px solid #ddd;
+      border-radius: 4px;
+      margin-right: 10px;
+      width: 150px;
+    }
+    
+    #seed-button {
+      padding: 8px 16px;
+      font-size: 16px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    
+    #seed-button:hover {
+      background-color: #45a049;
+    }
+    
+    #current-seed {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #666;
+    }
+  </style>
 </head>
 <body>
+  <div id="canvas-container"></div>
+  
+  <div id="game-info">
+    <div class="info-line">Moves: <span id="moves">0</span></div>
+    <div class="info-line">Target: <span id="target">0</span></div>
+  </div>
+
+  <div id="seed-controls">
+    <div>
+      <input type="text" id="seed-input" placeholder="Enter seed..." maxlength="20">
+      <button id="seed-button">New Game</button>
+    </div>
+    <div id="current-seed">Current seed: <span id="seed-display">loading...</span></div>
+  </div>
+
   <script type="module" src="main.js"></script>
   <script type="module" src="sketch.js"></script>
 </body>

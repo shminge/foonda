@@ -1,4 +1,4 @@
-import { choice, Direction, exhaust, rand, shuffleArray, v, Vec2, vEq } from "./utils.js";
+import { _RNG, Direction, exhaust, v, Vec2, vEq } from "./utils.js";
 import { Game } from "./main.js";
 import { Ball, BlobChar, Cell, Grate, Hole, Slash, Triangle, Wall } from "./classes.js";
 
@@ -32,16 +32,16 @@ function emptySpaces(g: Cell[][]): Vec2[] {
     return empty;
 }
 
-export function generateGrid(n: number, m: number, minDensity: number = 0.05, maxDensity: number = 0.2): [Cell[][], Vec2] {
+export function generateGrid(n: number, m: number, rng: _RNG, minDensity: number = 0.05, maxDensity: number = 0.2): [Cell[][], Vec2] {
     let g = Game.emptyGrid(n, m);
-    let elemCount = rand(minDensity, maxDensity) * (n - 1) * (m - 1);
+    let elemCount = rng.rand(minDensity, maxDensity) * (n - 1) * (m - 1);
     let empty = emptySpaces(g);
-    empty = shuffleArray(empty);
+    empty = rng.shuffleArray(empty);
     for (let i = 0; i < elemCount; i++) {
         let spot = empty.pop();
         if (spot) {
             let cell: Cell = {};
-            let q = choice([0, 1, 2, 3, 4, 5])
+            let q = rng.choice([0, 1, 2, 3, 4, 5])
             switch (q) {
                 case 0:
                     cell.tile = new Wall();
@@ -51,7 +51,7 @@ export function generateGrid(n: number, m: number, minDensity: number = 0.05, ma
                     break;
                 case 2:
                     let t = new Triangle();
-                    let c = choice([0, 1, 2, 3])
+                    let c = rng.choice([0, 1, 2, 3])
                     for (let cc = 0; cc < c; cc++) {
                         t.rotate();
                     }
@@ -59,7 +59,7 @@ export function generateGrid(n: number, m: number, minDensity: number = 0.05, ma
                     break;
                 case 3:
                     let s = new Slash();
-                    let cs = choice([0, 1]);
+                    let cs = rng.choice([0, 1]);
                     for (let cc = 0; cc < cs; cc++) {
                         s.rotate();
                     }
@@ -84,18 +84,18 @@ export function generateGrid(n: number, m: number, minDensity: number = 0.05, ma
     }
 }
 
-export function createPuzzle(n: number, m: number): [Cell[][], Vec2, Vec2] {
+export function createPuzzle(n: number, m: number, rng: _RNG): [Cell[][], Vec2, Vec2] {
 
 
-    let [grid, startPos] = generateGrid(n, m);
+    let [grid, startPos] = generateGrid(n, m, rng);
     // Clone grid before creating game to avoid mutating original
     let g = Game.newGame(cloneGrid(grid), startPos);
     //g.displayGrid()
-    let numMoves = rand(5, 20, true);
+    let numMoves = rng.rand(5, 20, true);
 
     let moves: Direction[] = [];
     for (let i = 0; i < numMoves; i++) {
-        let dir: Direction = choice(["up", "down", "left", "right"]);
+        let dir: Direction = rng.choice(["up", "down", "left", "right"]);
 
         const gen = g.blobImpluse(dir);
         
@@ -106,7 +106,7 @@ export function createPuzzle(n: number, m: number): [Cell[][], Vec2, Vec2] {
     // finally
     let possEnds: Vec2[] = [g.blobPos];
 
-    let dir: Direction = choice(["up", "down", "left", "right"]);
+    let dir: Direction = rng.choice(["up", "down", "left", "right"]);
     moves.push(dir);
 
     const gen = g.blobImpluse(dir);
@@ -115,7 +115,7 @@ export function createPuzzle(n: number, m: number): [Cell[][], Vec2, Vec2] {
         possEnds.push(g.blobPos);
     }
 
-    let chosenEnd = choice(possEnds);
+    let chosenEnd = rng.choice(possEnds);
     
 
 

@@ -9,7 +9,7 @@
 - O hole (wall that can be filled by ball)
 - = grate (turns into hole after traversal by blob or ball)
 */
-import { Vec2, Direction, v, directionStep, vEq } from "./utils.js";
+import { Vec2, Direction, v, directionStep, vEq, _RNG } from "./utils.js";
 import { Cell, Wall, BlobChar, Entity, Ball, Grate, Hole, Slash, Triangle, Star } from "./classes.js";
 import { calcMin, createPuzzle, generateGrid } from "./generator.js";
 //import * as readline from 'readline';
@@ -379,13 +379,39 @@ export class Game {
  */
 
 
-export function setupGame(x:number, y:number, minMoves: number): [Game, number] {
+export function setupGame(x:number, y:number, difficulty: string, seed: string): [Game, number] {
+    let iterCount = 100;
+        switch (difficulty) {
+            case 'easy' :
+                iterCount = 100; break;
+            case 'medium': 
+                iterCount = 1000; break;
+            case 'hard': 
+                iterCount = 100000; break;
+            case 'nightmare':
+                iterCount = 500000; break;
+        }
+
+
+
+    let rng = new _RNG(seed);
     let nm = 0;
     let g: [Cell[][], Vec2, Vec2];
-    while (nm < 10) {
-        g = createPuzzle(x, y);
+    let bestnm = 0;
+    let bestg: [Cell[][], Vec2, Vec2];
+    let a: number = 0;
+    while (a < iterCount) {
+        a++
+        g = createPuzzle(x, y, rng);
         nm = (calcMin(...g));
+        if (nm > bestnm) {
+            bestnm = nm;
+            bestg = g;
+        }
     }
+    g = bestg!;
+    nm = bestnm;
+    
     let ng: [Game, number] =  [Game.newGame(g![0], g![1]),nm];
     ng[0].grid[g![2].x][g![2].y].tile = new Star;
     return ng;
