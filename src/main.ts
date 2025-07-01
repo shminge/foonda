@@ -380,21 +380,14 @@ export class Game {
 
 
 export function setupGame(x:number, y:number, difficulty: string, seed: string): [Game, number] {
-    let iterCount = 100;
-        switch (difficulty) {
-            case 'easy' :
-                iterCount = 100; break;
-            case 'medium': 
-                iterCount = 1000; break;
-            case 'hard': 
-                iterCount = 100000; break;
-            case 'nightmare':
-                iterCount = 500000; break;
-        }
-
-
 
     let rng = new _RNG(seed);
+
+    
+    let iterCount = rng.choice([50, 100, 500, 1000, 5000, 10000, 50000, 100000])
+
+    console.log(iterCount);
+
     let nm = 0;
     let g: [Cell[][], Vec2, Vec2];
     let bestnm = 0;

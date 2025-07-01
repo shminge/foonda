@@ -63,6 +63,7 @@ function setupSeedControls() {
         // Allow Enter key to trigger new game
         seedInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
+                seedInput.blur();
                 seedButton.click();
             }
         });
