@@ -1,6 +1,6 @@
-import { choice, Direction, exhaust, rand, shuffleArray, v, Vec2, vEq } from "./utils";
-import { Game } from "./main";
-import { Ball, BlobChar, Cell, Grate, Hole, Slash, Triangle, Wall } from "./classes";
+import { choice, Direction, exhaust, rand, shuffleArray, v, Vec2, vEq } from "./utils.js";
+import { Game } from "./main.js";
+import { Ball, BlobChar, Cell, Grate, Hole, Slash, Triangle, Wall } from "./classes.js";
 
 type PuzzleStack = [Game, number][]
 

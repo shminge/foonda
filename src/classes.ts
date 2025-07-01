@@ -1,4 +1,4 @@
-import { Direction } from "./utils";
+import { Direction } from "./utils.js";
 
 export type Cell = {
     entity?: Entity;

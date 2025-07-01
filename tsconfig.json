@@ -1,11 +1,12 @@
 {
-    "compilerOptions": {
-        "outDir": "dist",
-        "rootDir": "src",
-        "target": "es2022",
-        "module": "commonjs",
-        "strict": true,
-        "esModuleInterop": true,
-    },
-    "include": ["src"]
+  "compilerOptions": {
+    "target": "ES6",
+    "module": "ESNext",
+    "strict": true,
+    "esModuleInterop": true,
+    "moduleResolution": "Node",
+    "outDir": "dist",
+    "allowJs": true,
+  },
+  "include": ["src"]
 }

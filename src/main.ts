@@ -9,10 +9,10 @@
 - O hole (wall that can be filled by ball)
 - = grate (turns into hole after traversal by blob or ball)
 */
-import { Vec2, Direction, v, directionStep } from "./utils";
-import { Cell, Wall, BlobChar, Entity, Ball, Grate, Hole, Slash, Triangle, Star } from "./classes";
-import { calcMin, createPuzzle, generateGrid } from "./generator";
-import * as readline from 'readline';
+import { Vec2, Direction, v, directionStep, vEq } from "./utils.js";
+import { Cell, Wall, BlobChar, Entity, Ball, Grate, Hole, Slash, Triangle, Star } from "./classes.js";
+import { calcMin, createPuzzle, generateGrid } from "./generator.js";
+//import * as readline from 'readline';
 
 
 
@@ -163,24 +163,20 @@ export class Game {
                     }
 
                     if (nextCell.tile instanceof Slash || nextCell.tile instanceof Triangle) {
-                        let extD = nextCell.tile.exitDir(dir);
-                        let bouncedTile = directionStep(nextPos, extD);
-                        if (this.getCell(bouncedTile).tile?.enterable(extD) ?? true) {
-                            let b: Ball | undefined = this.getCell(bouncedTile).entity;
-                            if (b) {
-                                const pushed = yield* this.ballImpulse(b, bouncedTile, extD);
-                                if (!pushed) return;
-                                this.moveBlob(bouncedTile);
-                                return;
-                            }
+
+                        let canExit = this.canExitBounce(nextPos, dir, false);
+
+                        
+                        if (canExit) {
                             this.moveBlob(nextPos);
+                            let extD = nextCell.tile.exitDir(dir);
                             nextCell.tile.rotate();
-                            yield;
                             yield* this.blobImpluse(extD);
                             return;
                         } else {
                             return;
                         }
+
                     }
 
 
@@ -198,6 +194,54 @@ export class Game {
             }
         }
     }
+
+
+    canExitBounce(v: Vec2, dir: Direction, isBall: boolean): boolean {
+        let cell = this.getCell(v);
+        let t = cell.tile;
+
+        if (t) {
+            if (t instanceof Slash || t instanceof Triangle) {
+                let extDir = t.exitDir(dir);
+                let moveSpot = directionStep(v, extDir);
+                let moveTile = this.getCell(moveSpot);
+                if (moveTile.entity) {
+                    if (moveTile.entity instanceof BlobChar) {
+                        return !isBall; // the blob can pass through itself (it is moving) but balls cannot
+                    }
+
+                    if (moveTile.entity instanceof Ball) {
+                        if (isBall) {
+                            return false;
+                        } else {
+                            let testClone = this.clone();
+                            let pushTest = testClone.ballImpulse(testClone.getCell(moveSpot).entity!, moveSpot, extDir);
+                            let p = pushTest.next();
+                            if (p.done) {
+                                return p.value;
+                            } else {
+                                return true;
+                            }
+                            
+                        }
+                    }
+                }
+
+
+                if (!moveTile.tile || moveTile.tile.enterable(extDir)) {
+                    if (moveTile.tile instanceof Slash || moveTile.tile instanceof Triangle) {
+                        //console.assert(!vEq(moveSpot,v))
+                        return this.canExitBounce(moveSpot, extDir, isBall);
+                    }
+                } else {
+                    return false
+                }
+            }
+
+        }
+
+        return true;
+    } 
 
 
 
@@ -257,21 +301,20 @@ export class Game {
                     }
 
                     if (nextCell.tile instanceof Slash || nextCell.tile instanceof Triangle) {
-                        let extD = nextCell.tile.exitDir(dir);
-                        let bouncedTile = directionStep(nextPos, extD);
-                        if (this.getCell(bouncedTile).tile?.enterable(extD) ?? true) {
-                            let b: Ball | undefined = this.getCell(bouncedTile).entity;
-                            if (b) return moved;
 
-                            ballPos = this.moveGeneric(ballPos, nextPos);
+                        let canExit = this.canExitBounce(nextPos, dir, true);
+
+                        
+                        if (canExit) {
+                            ballPos = this.moveGeneric(ballPos,nextPos);
+                            let extD = nextCell.tile.exitDir(dir);
                             nextCell.tile.rotate();
-                            moved = true;
-                            yield;
-                            yield* this.ballImpulse(ball, bouncedTile, extD);
+                            yield* this.ballImpulse(ball, ballPos, extD);
                             return true;
                         } else {
                             return moved;
                         }
+
                     }
                 }
             } else {
@@ -282,7 +325,7 @@ export class Game {
         }
     }
 
-
+    /*
 
     play(target: number): void {
         const rl = readline.createInterface({
@@ -325,6 +368,7 @@ export class Game {
         playInstance.displayGrid();
         promptInput(1);
     }
+        */
 
 }
 
@@ -334,17 +378,24 @@ export class Game {
  * Abandon hope all ye who enter here
  */
 
-let nm = 0;
-let g: [Cell[][], Vec2, Vec2];
-while (nm < 10) {
-    g = createPuzzle(10, 10);
-    nm = (calcMin(...g));
+
+export function setupGame(x:number, y:number, minMoves: number): [Game, number] {
+    let nm = 0;
+    let g: [Cell[][], Vec2, Vec2];
+    while (nm < 10) {
+        g = createPuzzle(x, y);
+        nm = (calcMin(...g));
+    }
+    let ng: [Game, number] =  [Game.newGame(g![0], g![1]),nm];
+    ng[0].grid[g![2].x][g![2].y].tile = new Star;
+    return ng;
+
 }
-let ng = Game.newGame(g![0], g![1]);
-console.log("Get to the % in "+ nm + " moves!")
-ng.grid[g![2].x][g![2].y].tile = new Star;
+
+//console.log("Get to the % in "+ nm + " moves!")
+//ng.grid[g![2].x][g![2].y].tile = new Star;
 //ng.displayGrid();
-ng.play(nm);
+//ng.play(nm);
 
 
 /*= new Game()
@@ -372,3 +423,5 @@ for (let a of actions) {
     }
 }
     */
+
+
