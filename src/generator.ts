@@ -230,7 +230,14 @@ export function createPuzzleBFS(n: number, m: number, rng: _RNG): [Cell[][], Vec
             let gclone = stackGame!.clone();
             let gen = gclone.blobImpluse(dir);
 
-            exhaust(gen);
+            //exhaust(gen);
+
+            // we need to track all the visited positions, including while moving
+            let moved_past: Vec2[] = [];
+
+            for (const _ of gen) {
+                moved_past.push(gclone.blobPos)
+            }
 
             let sg = gclone.serializeGrid();
 
@@ -248,21 +255,25 @@ export function createPuzzleBFS(n: number, m: number, rng: _RNG): [Cell[][], Vec
                     }
                 )
 
+                for (let pos of moved_past) {
+                    let moveCount = posMap.get(JSON.stringify(pos));
 
-                let clonePos = gclone.blobPos;
-
-                let moveCount = posMap.get(JSON.stringify(clonePos));
-
-                if (moveCount) {
-                    if (stackDepth + 1 < moveCount) {
-                        posMap.set(JSON.stringify(clonePos), stackDepth + 1);
+                    
+                    if (moveCount) {
+                        if (stackDepth + 1 < moveCount) {
+                            posMap.set(JSON.stringify(pos), stackDepth + 1);
+                        }
+                    } else {
+                        posMap.set(JSON.stringify(pos), stackDepth + 1);
+                        if (stackDepth + 1 > maxDepth) {
+                            maxDepth = stackDepth + 1
+                        }
                     }
-                } else {
-                    posMap.set(JSON.stringify(clonePos), stackDepth + 1);
-                    if (stackDepth + 1 > maxDepth) {
-                        maxDepth = stackDepth + 1
-                    }
+
+
                 }
+                
+
             }   
         }
     }
