@@ -71,6 +71,7 @@ function setupSeedControls() {
 }
 
 function loadNewGame(seed = null) {
+    console.log("Loading new game")
     currentSeed = seed || getTodaysDate();
     [game, minMoves] = setupGameBFS(xsize, ysize, currentSeed);
     resetPoint = game.clone();

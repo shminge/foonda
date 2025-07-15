@@ -1,0 +1,7 @@
+/node_modules/
+.vscode/
+dist/classes.js
+dist/generator.js
+dist/main.js
+dist/sketch.js
+dist/utils.js

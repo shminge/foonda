@@ -434,6 +434,7 @@ export function setupGameBFS(x: number, y: number, seed: string) {
             continue;
         } else {
             g.grid[endPos.x][endPos.y].tile = new Star;
+            invalid = false;
         }
         
     }

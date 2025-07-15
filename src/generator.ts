@@ -248,6 +248,7 @@ export function createPuzzleBFS(n: number, m: number, rng: _RNG): [Cell[][], Vec
                     }
                 )
 
+
                 let clonePos = gclone.blobPos;
 
                 let moveCount = posMap.get(JSON.stringify(clonePos));
@@ -258,6 +259,9 @@ export function createPuzzleBFS(n: number, m: number, rng: _RNG): [Cell[][], Vec
                     }
                 } else {
                     posMap.set(JSON.stringify(clonePos), stackDepth + 1);
+                    if (stackDepth + 1 > maxDepth) {
+                        maxDepth = stackDepth + 1
+                    }
                 }
             }   
         }
@@ -266,10 +270,11 @@ export function createPuzzleBFS(n: number, m: number, rng: _RNG): [Cell[][], Vec
     let exitPos: Vec2;
 
     for (const [pos, depth] of posMap) {
-        if (depth > maxDepth) {
+        if (depth >= maxDepth) {
             exitPos = JSON.parse(pos);
         }
     }
+    console.log(grid, startPos, exitPos!, maxDepth)
 
     return [grid, startPos, exitPos!, maxDepth]
 
