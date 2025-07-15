@@ -86,8 +86,16 @@ function setup() {
         const sprite = spriteSheet.get(0, y, 32, 32);
         sprites[spriteNames[i]] = sprite;
     }
-    // Initialize with today's date as default seed
-    loadNewGame();
+    const params = getURLParams();
+    // Load game with URL seed if it exists, otherwise use default
+    if (params.seed) {
+        const urlSeed = params.seed;
+        loadNewGame(urlSeed);
+    }
+    else {
+        // Initialize with today's date as default seed
+        loadNewGame();
+    }
     let longer = max(xsize, ysize);
     spriteScale = canvasSize / longer;
     xAnchor = canvasSize / 2 - (spriteScale * xsize / 2);
