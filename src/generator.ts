@@ -194,3 +194,83 @@ export function backstep(g: Cell[][], bPos: Vec2): PuzzleStack[] {
     return [[g, bPos]];
 }
 */
+
+
+/**
+ * 
+ * @param n 
+ * @param m 
+ * @param rng 
+ * @returns grid, startpos, endpos, numMoves
+ */
+
+type BFSEntry = {game: Game, depth: number}
+
+
+export function createPuzzleBFS(n: number, m: number, rng: _RNG): [Cell[][], Vec2, Vec2, number] {
+    let [grid, startPos] = generateGrid(n, m, rng); 
+
+    const directions = ["up", "down", "left", "right"] as const;
+    let stack: BFSEntry[] = [];
+    let seen: Map<string, number> = new Map();
+    let posMap: Map<string, number> = new Map();
+
+    stack.push({game: Game.newGame(cloneGrid(grid), startPos), depth: 0});
+
+    let maxDepth = 0;
+
+    while (stack.length > 0) {
+        console.log("Depth: " + stack.length);
+        console.log("Seen: " + seen.size);
+        let stackInstance = stack.shift();
+        let stackGame = stackInstance!.game;
+        let stackDepth = stackInstance!.depth;
+
+        for (let dir of directions) {
+            let gclone = stackGame!.clone();
+            let gen = gclone.blobImpluse(dir);
+
+            exhaust(gen);
+
+            let sg = gclone.serializeGrid();
+
+            if (seen.has(sg)) {
+                //console.log("Already seen")
+                continue;
+            } else {
+
+                seen.set(sg, stackDepth + 1);
+
+                stack.push(
+                    {
+                        game: gclone,
+                        depth: stackDepth + 1
+                    }
+                )
+
+                let clonePos = gclone.blobPos;
+
+                let moveCount = posMap.get(JSON.stringify(clonePos));
+
+                if (moveCount) {
+                    if (stackDepth + 1 < moveCount) {
+                        posMap.set(JSON.stringify(clonePos), stackDepth + 1);
+                    }
+                } else {
+                    posMap.set(JSON.stringify(clonePos), stackDepth + 1);
+                }
+            }   
+        }
+    }
+
+    let exitPos: Vec2;
+
+    for (const [pos, depth] of posMap) {
+        if (depth > maxDepth) {
+            exitPos = JSON.parse(pos);
+        }
+    }
+
+    return [grid, startPos, exitPos!, maxDepth]
+
+}

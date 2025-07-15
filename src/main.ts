@@ -11,7 +11,8 @@
 */
 import { Vec2, Direction, v, directionStep, vEq, _RNG } from "./utils.js";
 import { Cell, Wall, BlobChar, Entity, Ball, Grate, Hole, Slash, Triangle, Star } from "./classes.js";
-import { calcMin, createPuzzle, generateGrid } from "./generator.js";
+import { calcMin, createPuzzle, createPuzzleBFS, generateGrid } from "./generator.js";
+import { deprecate } from "util";
 //import * as readline from 'readline';
 
 
@@ -373,7 +374,6 @@ export class Game {
 }
 
 
-
 /**
  * Abandon hope all ye who enter here
  */
@@ -408,6 +408,37 @@ export function setupGame(x:number, y:number, difficulty: string, seed: string):
     let ng: [Game, number] =  [Game.newGame(g![0], g![1]),nm];
     ng[0].grid[g![2].x][g![2].y].tile = new Star;
     return ng;
+
+}
+
+
+export function setupGameBFS(x: number, y: number, seed: string) {
+
+    let rng = new _RNG(seed);
+
+    let invalid = true;
+
+    let grid;
+    let startPos;
+    let endPos;
+    let depth;
+    let g;
+
+    while (invalid) {
+
+        [grid, startPos, endPos, depth] = createPuzzleBFS(x, y, rng);
+        
+        g = Game.newGame(grid, startPos);
+        if (g.grid[endPos.x][endPos.y].tile) {
+            console.log('Botched setup. Restarting...')
+            continue;
+        } else {
+            g.grid[endPos.x][endPos.y].tile = new Star;
+        }
+        
+    }
+
+    return [g, depth];
 
 }
 

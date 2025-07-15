@@ -1,4 +1,4 @@
-import { Game, setupGame } from "./main.js";
+import { Game, setupGame, setupGameBFS } from "./main.js";
 
 window.setup = setup;
 window.draw = draw;
@@ -72,7 +72,7 @@ function setupSeedControls() {
 
 function loadNewGame(seed = null) {
     currentSeed = seed || getTodaysDate();
-    [game, minMoves] = setupGame(xsize, ysize, 'medium', currentSeed);
+    [game, minMoves] = setupGameBFS(xsize, ysize, currentSeed);
     resetPoint = game.clone();
     numMoves = 0;
     updateHTML();
