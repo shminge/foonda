@@ -25,7 +25,7 @@ function emptySpaces(g) {
     }
     return empty;
 }
-export function generateGrid(n, m, rng, minDensity = 0.05, maxDensity = 0.2) {
+export function generateGrid(n, m, rng, minDensity = 0.05, maxDensity = 0.3) {
     let g = Game.emptyGrid(n, m);
     let elemCount = rng.rand(minDensity, maxDensity) * (n - 1) * (m - 1);
     let empty = emptySpaces(g);
@@ -143,20 +143,20 @@ export function createPuzzleBFS(n, m, rng) {
     let stack = [];
     let seen = new Map();
     let posMap = new Map();
-    stack.push({ game: Game.newGame(cloneGrid(grid), startPos), depth: 0 });
+    stack.push({ game: Game.newGame(cloneGrid(grid), startPos), depth: 0, instructions: '' });
     let maxDepth = 0;
     while (stack.length > 0) {
-        console.log("Depth: " + stack.length);
-        console.log("Seen: " + seen.size);
         let stackInstance = stack.shift();
         let stackGame = stackInstance.game;
         let stackDepth = stackInstance.depth;
+        let stackInstructions = stackInstance.instructions;
         for (let dir of directions) {
             let gclone = stackGame.clone();
             let gen = gclone.blobImpluse(dir);
+            let _d = dir[0].toUpperCase();
             //exhaust(gen);
             // we need to track all the visited positions, including while moving
-            let moved_past = [];
+            let moved_past = [gclone.blobPos];
             for (const _ of gen) {
                 moved_past.push(gclone.blobPos);
             }
@@ -169,17 +169,18 @@ export function createPuzzleBFS(n, m, rng) {
                 seen.set(sg, stackDepth + 1);
                 stack.push({
                     game: gclone,
-                    depth: stackDepth + 1
+                    depth: stackDepth + 1,
+                    instructions: stackInstructions + _d
                 });
                 for (let pos of moved_past) {
-                    let moveCount = posMap.get(JSON.stringify(pos));
-                    if (moveCount) {
-                        if (stackDepth + 1 < moveCount) {
-                            posMap.set(JSON.stringify(pos), stackDepth + 1);
+                    let moveData = posMap.get(JSON.stringify(pos));
+                    if (moveData) {
+                        if (stackDepth + 1 < moveData[0]) {
+                            posMap.set(JSON.stringify(pos), [stackDepth + 1, stackInstructions + _d]);
                         }
                     }
                     else {
-                        posMap.set(JSON.stringify(pos), stackDepth + 1);
+                        posMap.set(JSON.stringify(pos), [stackDepth + 1, stackInstructions + _d]);
                         if (stackDepth + 1 > maxDepth) {
                             maxDepth = stackDepth + 1;
                         }
@@ -189,11 +190,12 @@ export function createPuzzleBFS(n, m, rng) {
         }
     }
     let exitPos;
-    for (const [pos, depth] of posMap) {
-        if (depth >= maxDepth) {
+    for (const [pos, data] of posMap) {
+        if (data[0] >= maxDepth) {
             exitPos = JSON.parse(pos);
+            console.log("Solution: " + data[1]);
+            break;
         }
     }
-    console.log(grid, startPos, exitPos, maxDepth);
     return [grid, startPos, exitPos, maxDepth];
 }

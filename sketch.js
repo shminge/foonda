@@ -7,7 +7,6 @@ var canvasSize = 500;
 var isMoving = false;
 var spriteSheet;
 var sprites = {};
-var resetPoint;
 var game;
 var minMoves;
 var numMoves = 0;
@@ -17,6 +16,7 @@ var yAnchor;
 var xsize = 10;
 var ysize = 10;
 var currentSeed = "";
+var undoStack = [];
 // Get today's date in dd/mm/yyyy format
 function getTodaysDate() {
     const today = new Date();
@@ -67,7 +67,7 @@ function loadNewGame(seed = null) {
     console.log("Loading new game");
     currentSeed = seed || getTodaysDate();
     [game, minMoves] = setupGameBFS(xsize, ysize, currentSeed);
-    resetPoint = game.clone();
+    undoStack.push(game.clone());
     numMoves = 0;
     updateHTML();
     draw();
@@ -180,11 +180,21 @@ function draw() {
 }
 function keyPressed() {
     if (key === 'r') {
-        game = resetPoint.clone();
+        game = undoStack[0].clone();
         numMoves = 0; // Reset move counter
         updateHTML(); // Update HTML display
         draw();
         return;
+    }
+    if (key === 'z') {
+        if (undoStack.length > 1) {
+            undoStack.pop();
+            game = undoStack[undoStack.length - 1].clone();
+            numMoves -= 1;
+            updateHTML();
+            draw();
+            return;
+        }
     }
     let gen;
     if (keyCode === UP_ARROW) {
@@ -216,5 +226,6 @@ function animateMovement(generator) {
     }
     else {
         isMoving = false;
+        undoStack.push(game.clone());
     }
 }
