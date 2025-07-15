@@ -25,7 +25,7 @@ function emptySpaces(g) {
     }
     return empty;
 }
-export function generateGrid(n, m, rng, minDensity = 0.1, maxDensity = 0.4) {
+export function generateGrid(n, m, rng, minDensity = 0.05, maxDensity = 0.3) {
     let g = Game.emptyGrid(n, m);
     let elemCount = rng.rand(minDensity, maxDensity) * (n - 1) * (m - 1);
     let empty = emptySpaces(g);

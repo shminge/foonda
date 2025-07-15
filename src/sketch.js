@@ -99,8 +99,25 @@ function setup() {
         sprites[spriteNames[i]] = sprite;
     }
 
-    // Initialize with today's date as default seed
-    loadNewGame();
+    const params = getURLParams();
+
+
+    // Load game with URL seed if it exists, otherwise use default
+    if (params.seed) {
+        const urlSeed = params.seed;
+        loadNewGame(urlSeed)
+    } else {
+        // Initialize with today's date as default seed
+        loadNewGame();
+    }
+
+    
+
+
+
+
+
+
     
     let longer = max(xsize, ysize);
     spriteScale = canvasSize/longer;
