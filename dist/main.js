@@ -291,11 +291,18 @@ export class Game {
                         yield;
                         continue;
                     }
-                    if (nextCell.tile instanceof Hole && nextCell.tile.filled) {
-                        ballPos = this.moveGeneric(ballPos, nextPos);
-                        moved = true;
-                        yield;
-                        continue;
+                    if (nextCell.tile instanceof Hole) {
+                        if (nextCell.tile.filled) {
+                            ballPos = this.moveGeneric(ballPos, nextPos);
+                            moved = true;
+                            yield;
+                            continue;
+                        }
+                        else {
+                            nextCell.tile.filled = true;
+                            this.getCell(v(ballPos.x, ballPos.y)).entity = undefined;
+                            return true;
+                        }
                     }
                     if (nextCell.tile instanceof Star) {
                         ballPos = this.moveGeneric(ballPos, nextPos);

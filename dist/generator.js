@@ -25,7 +25,7 @@ function emptySpaces(g) {
     }
     return empty;
 }
-export function generateGrid(n, m, rng, minDensity = 0.05, maxDensity = 0.2) {
+export function generateGrid(n, m, rng, minDensity = 0.1, maxDensity = 0.4) {
     let g = Game.emptyGrid(n, m);
     let elemCount = rng.rand(minDensity, maxDensity) * (n - 1) * (m - 1);
     let empty = emptySpaces(g);
@@ -156,7 +156,7 @@ export function createPuzzleBFS(n, m, rng) {
             let gen = gclone.blobImpluse(dir);
             //exhaust(gen);
             // we need to track all the visited positions, including while moving
-            let moved_past = [];
+            let moved_past = [gclone.blobPos];
             for (const _ of gen) {
                 moved_past.push(gclone.blobPos);
             }
