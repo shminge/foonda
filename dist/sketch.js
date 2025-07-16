@@ -67,6 +67,7 @@ function loadNewGame(seed = null) {
     console.log("Loading new game");
     currentSeed = seed || getTodaysDate();
     [game, minMoves] = setupGameBFS(xsize, ysize, currentSeed);
+    undoStack = [];
     undoStack.push(game.clone());
     numMoves = 0;
     updateHTML();

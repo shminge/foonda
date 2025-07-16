@@ -279,13 +279,30 @@ export function createPuzzleBFS(n: number, m: number, rng: _RNG): [Cell[][], Vec
         }
     }
 
-    let exitPos: Vec2;
+    let exitPos: Vec2| undefined;
 
-    for (const [pos, data] of posMap) {
-        if (data[0] >= maxDepth) {
-            exitPos = JSON.parse(pos);
-            console.log("Solution: " + data[1])
+    while (!exitPos) {
+        for (const [pos, data] of posMap) {
+            if (data[0] >= maxDepth) {
+                let potential = JSON.parse(pos);
+
+                if (grid[potential!.x][potential!.y].tile) {
+                    console.log(`Potential end at ${JSON.stringify(potential)} has ${grid[potential!.x][potential!.y].tile!.kind} blocking`);
+                    posMap.delete(pos);
+                    continue;
+                }
+                console.log("Solution: " + data[1].match(/.{1,5}/g)?.join(' '))
+                exitPos = potential;
+                break;
+            }
+        }
+        if (exitPos) {
             break;
+        }
+        console.log("Lowering threshold to "+ maxDepth );
+        maxDepth -= 1
+        if (maxDepth == 0) {
+            return createPuzzleBFS(n, m, rng) // fallback
         }
     }
 
