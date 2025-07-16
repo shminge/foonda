@@ -138,6 +138,7 @@ export function calcMin(grid, startPos, endPos) {
     throw new Error("Unreachable end position");
 }
 export function createPuzzleBFS(n, m, rng) {
+    var _a;
     let [grid, startPos] = generateGrid(n, m, rng);
     const directions = ["up", "down", "left", "right"];
     let stack = [];
@@ -190,11 +191,27 @@ export function createPuzzleBFS(n, m, rng) {
         }
     }
     let exitPos;
-    for (const [pos, data] of posMap) {
-        if (data[0] >= maxDepth) {
-            exitPos = JSON.parse(pos);
-            console.log("Solution: " + data[1]);
+    while (!exitPos) {
+        for (const [pos, data] of posMap) {
+            if (data[0] >= maxDepth) {
+                let potential = JSON.parse(pos);
+                if (grid[potential.x][potential.y].tile) {
+                    console.log(`Potential end at ${JSON.stringify(potential)} has ${grid[potential.x][potential.y].tile.kind} blocking`);
+                    posMap.delete(pos);
+                    continue;
+                }
+                console.log("Solution: " + ((_a = data[1].match(/.{1,5}/g)) === null || _a === void 0 ? void 0 : _a.join(' ')));
+                exitPos = potential;
+                break;
+            }
+        }
+        if (exitPos) {
             break;
+        }
+        console.log("Lowering threshold to " + maxDepth);
+        maxDepth -= 1;
+        if (maxDepth == 0) {
+            return createPuzzleBFS(n, m, rng); // fallback
         }
     }
     return [grid, startPos, exitPos, maxDepth];
