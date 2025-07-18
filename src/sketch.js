@@ -253,15 +253,19 @@ function handleInput(input) {
     switch (input) {
         case 'up':
             keyCode = UP_ARROW;
+            key = '';
             break;
         case 'down':
             keyCode = DOWN_ARROW;
+            key = '';
             break;
         case 'left':
             keyCode = LEFT_ARROW;
+            key = '';
             break;
         case 'right':
             keyCode = RIGHT_ARROW;
+            key = '';
             break;
         case 'undo':
             key = 'z';
@@ -275,6 +279,7 @@ function handleInput(input) {
 
     keyPressed();
 }
+
 
 
 function keyPressed() {

@@ -1,4 +1,4 @@
-import { Game, setupGame, setupGameBFS } from "./main.js";
+import { setupGameBFS } from "./main.js";
 window.setup = setup;
 window.draw = draw;
 window.preload = preload;
@@ -230,15 +230,19 @@ function handleInput(input) {
     switch (input) {
         case 'up':
             keyCode = UP_ARROW;
+            key = '';
             break;
         case 'down':
             keyCode = DOWN_ARROW;
+            key = '';
             break;
         case 'left':
             keyCode = LEFT_ARROW;
+            key = '';
             break;
         case 'right':
             keyCode = RIGHT_ARROW;
+            key = '';
             break;
         case 'undo':
             key = 'z';
