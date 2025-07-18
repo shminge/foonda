@@ -49,7 +49,7 @@ function emptyTiles(g: Cell[][]): Vec2[] {
     return empty;
 }
 
-export function generateGrid(n: number, m: number, rng: _RNG, minDensity: number = 0.05, maxDensity: number = 0.3): [Cell[][], Vec2] {
+export function generateGrid(n: number, m: number, rng: _RNG, minDensity: number = 0.05, maxDensity: number = 0.2): [Cell[][], Vec2] {
     let g = Game.emptyGrid(n, m);
     let elemCount = rng.rand(minDensity, maxDensity) * (n - 1) * (m - 1);
     let empty = emptySpaces(g);
