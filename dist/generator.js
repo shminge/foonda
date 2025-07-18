@@ -17,7 +17,23 @@ function emptySpaces(g) {
     let empty = [];
     for (let x = 0; x < g.length; x++) {
         for (let y = 0; y < g[0].length; y++) {
-            if (g[x][y].entity || g[x][y].tile) {
+            if (g[x][y].tile || g[x][y].entity) {
+                continue;
+            }
+            empty.push(v(x, y));
+        }
+    }
+    return empty;
+}
+/**
+ * Returns coords of tile-less cells
+ * @param g
+ */
+function emptyTiles(g) {
+    let empty = [];
+    for (let x = 0; x < g.length; x++) {
+        for (let y = 0; y < g[0].length; y++) {
+            if (g[x][y].tile) {
                 continue;
             }
             empty.push(v(x, y));
@@ -140,6 +156,7 @@ export function calcMin(grid, startPos, endPos) {
 export function createPuzzleBFS(n, m, rng) {
     var _a;
     let [grid, startPos] = generateGrid(n, m, rng);
+    let possTargets = emptyTiles(grid);
     const directions = ["up", "down", "left", "right"];
     let stack = [];
     let seen = new Map();
@@ -147,6 +164,10 @@ export function createPuzzleBFS(n, m, rng) {
     stack.push({ game: Game.newGame(cloneGrid(grid), startPos), depth: 0, instructions: '' });
     let maxDepth = 0;
     while (stack.length > 0) {
+        if (possTargets.every(pos => posMap.has(JSON.stringify(pos)))) {
+            console.log("Visited every square, breaking early");
+            break;
+        }
         let stackInstance = stack.shift();
         let stackGame = stackInstance.game;
         let stackDepth = stackInstance.depth;
@@ -208,9 +229,10 @@ export function createPuzzleBFS(n, m, rng) {
         if (exitPos) {
             break;
         }
-        console.log("Lowering threshold to " + maxDepth);
         maxDepth -= 1;
-        if (maxDepth == 0) {
+        console.log("Lowering threshold to " + maxDepth);
+        if (maxDepth <= 0) {
+            console.log("Failed, resetting");
             return createPuzzleBFS(n, m, rng); // fallback
         }
     }

@@ -23,7 +23,24 @@ function emptySpaces(g: Cell[][]): Vec2[] {
     let empty: Vec2[] = [];
     for (let x = 0; x < g.length; x++) {
         for (let y = 0; y < g[0].length; y++) {
-            if (g[x][y].entity || g[x][y].tile) {
+            if (g[x][y].tile || g[x][y].entity) {
+                continue;
+            }
+            empty.push(v(x, y));
+        }
+    }
+    return empty;
+}
+
+/**
+ * Returns coords of tile-less cells
+ * @param g 
+ */
+function emptyTiles(g: Cell[][]): Vec2[] {
+    let empty: Vec2[] = [];
+    for (let x = 0; x < g.length; x++) {
+        for (let y = 0; y < g[0].length; y++) {
+            if (g[x][y].tile) {
                 continue;
             }
             empty.push(v(x, y));
@@ -210,6 +227,8 @@ type BFSEntry = {game: Game, depth: number, instructions: string}
 export function createPuzzleBFS(n: number, m: number, rng: _RNG): [Cell[][], Vec2, Vec2, number] {
     let [grid, startPos] = generateGrid(n, m, rng); 
 
+    let possTargets = emptyTiles(grid);
+
     const directions = ["up", "down", "left", "right"] as const;
     let stack: BFSEntry[] = [];
     let seen: Map<string, number> = new Map();
@@ -220,6 +239,12 @@ export function createPuzzleBFS(n: number, m: number, rng: _RNG): [Cell[][], Vec
     let maxDepth = 0;
 
     while (stack.length > 0) {
+        
+        if (possTargets.every(pos => posMap.has(JSON.stringify(pos)))) {
+            console.log("Visited every square, breaking early")
+            break
+        }
+
         let stackInstance = stack.shift();
         let stackGame = stackInstance!.game;
         let stackDepth = stackInstance!.depth;
@@ -299,9 +324,13 @@ export function createPuzzleBFS(n: number, m: number, rng: _RNG): [Cell[][], Vec
         if (exitPos) {
             break;
         }
-        console.log("Lowering threshold to "+ maxDepth );
+        
         maxDepth -= 1
-        if (maxDepth == 0) {
+
+        console.log("Lowering threshold to " + maxDepth );
+
+        if (maxDepth <= 0) {
+            console.log("Failed, resetting")
             return createPuzzleBFS(n, m, rng) // fallback
         }
     }
