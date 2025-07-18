@@ -252,6 +252,7 @@ function draw() {
 function handleInput(input) {
     if (input === 'reset') {
         game = undoStack[0].clone();
+        undoStack.splice(1)
         numMoves = 0;
         updateHTML();
         draw();
@@ -285,42 +286,25 @@ function handleInput(input) {
 
 function keyPressed() {
     if (key === 'r') {
-        game = undoStack[0].clone();
-        numMoves = 0; // Reset move counter
-        updateHTML(); // Update HTML display
-        draw();
-        return
+        handleInput('reset')
     }
 
     if (key === 'z') {
-        if (undoStack.length > 1) {
-            undoStack.pop()
-            game = undoStack[undoStack.length-1].clone()
-            numMoves-=1;
-            updateHTML();
-            draw();
-            return;
-        }
+        handleInput('undo')
     }
 
     let gen;
     if (keyCode === UP_ARROW) {
-        gen = game.blobImpluse('up');
+        handleInput('up');
     }
     else if (keyCode === DOWN_ARROW) {
-        gen = game.blobImpluse('down');
+        handleInput('down');
     }
     else if (keyCode === LEFT_ARROW) {
-        gen = game.blobImpluse('left');
+        handleInput('left');
     }
     else if (keyCode === RIGHT_ARROW) {
-        gen = game.blobImpluse('right');
-    }
-    if (gen && !isMoving) {
-        numMoves += 1;
-        updateHTML(); // Update HTML when moves change
-        isMoving = true;
-        animateMovement(gen);
+        handleInput('right');
     }
 }
 
