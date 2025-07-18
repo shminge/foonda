@@ -3,53 +3,277 @@
 <head>
   <meta charset="UTF-8" />
   <title>Foonda Remake</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
       margin: 0;
-      padding: 20px;
+      padding: 0;
       background-color: #f0f0f0;
     }
     
-    #game-info {
-      margin-top: 20px;
-      padding: 15px;
-      background-color: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      font-size: 18px;
-      text-align: center;
-      min-width: 200px;
+    /* Desktop styles */
+    @media (min-width: 768px) {
+      body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+      }
+      
+      #game-container {
+        max-width: 500px;
+      }
+      
+      #canvas-container {
+        width: 500px;
+        height: 500px;
+      }
+      
+
     }
     
-    .info-line {
-      margin: 5px 0;
+    /* Mobile styles */
+    @media (max-width: 767px) {
+      body {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        padding: 8px;
+      }
+      
+      #game-container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+      }
+      
+      #canvas-container {
+        width: calc(100vw - 16px);
+        height: calc(100vw - 16px);
+        max-width: calc(100vh - 280px);
+        max-height: calc(100vh - 280px);
+        flex-shrink: 0;
+      }
+      
+      #controls {
+        width: 100%;
+        height: auto;
+        padding: 15px;
+        margin-top: 8px;
+        flex-shrink: 0;
+      }
+      
+      #game-info {
+        margin-top: 8px;
+        padding: 12px;
+        font-size: 16px;
+        flex-shrink: 0;
+      }
+      
+      #seed-controls {
+        margin-top: 8px;
+        padding: 12px;
+        flex-shrink: 0;
+      }
+      
+      #seed-input {
+        width: 120px;
+        font-size: 14px;
+        padding: 6px 10px;
+      }
+      
+      #seed-button {
+        padding: 6px 12px;
+        font-size: 14px;
+      }
     }
     
     #canvas-container {
       border: 2px solid #333;
       border-radius: 8px;
       overflow: hidden;
-      width: 500px;
-      height: 500px;
       background-color: #ddd;
       display: flex;
       align-items: center;
       justify-content: center;
     }
     
-    #seed-controls {
-      margin-top: 15px;
+    #controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #8b8b8b;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    
+    /* Hide controls on desktop by default */
+    @media (min-width: 768px) {
+      #controls {
+        display: none !important;
+      }
+    }
+    
+    /* D-Pad styles */
+    #dpad {
+      position: relative;
+      width: 130px;
+      height: 130px;
+    }
+    
+    @media (max-width: 767px) {
+      #dpad {
+        width: 110px;
+        height: 110px;
+      }
+    }
+    
+    .dpad-btn {
+      position: absolute;
+      background-color: #4a4a4a;
+      border: 2px solid #333;
+      border-radius: 6px;
+      color: white;
+      font-weight: bold;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.1s;
+      user-select: none;
+      touch-action: manipulation;
+    }
+    
+    .dpad-btn:hover {
+      background-color: #5a5a5a;
+    }
+    
+    .dpad-btn:active {
+      background-color: #3a3a3a;
+      transform: scale(0.95);
+    }
+    
+    #btn-up {
+      top: 0;
+      left: 45px;
+      width: 40px;
+      height: 40px;
+    }
+    
+    #btn-down {
+      bottom: 0;
+      left: 45px;
+      width: 40px;
+      height: 40px;
+    }
+    
+    #btn-left {
+      top: 45px;
+      left: 0;
+      width: 40px;
+      height: 40px;
+    }
+    
+    #btn-right {
+      top: 45px;
+      right: 0;
+      width: 40px;
+      height: 40px;
+    }
+    
+    @media (max-width: 767px) {
+      #btn-up, #btn-down {
+        left: 35px;
+        width: 40px;
+        height: 35px;
+      }
+      
+      #btn-left, #btn-right {
+        top: 37px;
+        width: 40px;
+        height: 35px;
+      }
+      
+      #btn-left {
+        left: 0;
+      }
+      
+      #btn-right {
+        right: 0;
+      }
+    }
+    
+    /* Action buttons */
+    #action-buttons {
+      display: flex;
+      gap: 25px;
+      align-items: center;
+    }
+    
+    @media (max-width: 767px) {
+      #action-buttons {
+        gap: 15px;
+      }
+    }
+    
+    .action-btn {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background-color: #4a4a4a;
+      border: 2px solid #333;
+      color: white;
+      font-weight: bold;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.1s;
+      user-select: none;
+      touch-action: manipulation;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    @media (max-width: 767px) {
+      .action-btn {
+        width: 65px;
+        height: 65px;
+        font-size: 10px;
+      }
+    }
+    
+    .action-btn:hover {
+      background-color: #5a5a5a;
+    }
+    
+    .action-btn:active {
+      background-color: #3a3a3a;
+      transform: scale(0.95);
+    }
+    
+    #game-info {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      font-size: 18px;
+      text-align: center;
+      min-width: 200px;
       padding: 15px;
+    }
+    
+    .info-line {
+      margin: 5px 0;
+    }
+    
+    #seed-controls {
       background-color: white;
       border-radius: 8px;
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
       text-align: center;
       min-width: 200px;
+      padding: 15px;
     }
     
     #seed-input {
@@ -84,19 +308,35 @@
   </style>
 </head>
 <body>
-  <div id="canvas-container"></div>
-  
-  <div id="game-info">
-    <div class="info-line">Moves: <span id="moves">0</span></div>
-    <div class="info-line">Target: <span id="target">0</span></div>
-  </div>
-
-  <div id="seed-controls">
-    <div>
-      <input type="text" id="seed-input" placeholder="Enter seed..." maxlength="20">
-      <button id="seed-button">New Game</button>
+  <div id="game-container">
+    <div id="canvas-container"></div>
+    
+    <div id="controls">
+      <div id="dpad">
+        <button class="dpad-btn" id="btn-up">↑</button>
+        <button class="dpad-btn" id="btn-down">↓</button>
+        <button class="dpad-btn" id="btn-left">←</button>
+        <button class="dpad-btn" id="btn-right">→</button>
+      </div>
+      
+      <div id="action-buttons">
+        <button class="action-btn" id="btn-undo">UNDO</button>
+        <button class="action-btn" id="btn-reset">RESET</button>
+      </div>
     </div>
-    <div id="current-seed">Current seed: <span id="seed-display">loading...</span></div>
+
+    <div id="game-info">
+      <div class="info-line">Moves: <span id="moves">0</span></div>
+      <div class="info-line">Target: <span id="target">0</span></div>
+    </div>
+
+    <div id="seed-controls">
+      <div>
+        <input type="text" id="seed-input" placeholder="Enter seed..." maxlength="20">
+        <button id="seed-button">New Game</button>
+      </div>
+      <div id="current-seed">Current seed: <span id="seed-display">loading...</span></div>
+    </div>
   </div>
 
   <script type="module" src="main.js"></script>

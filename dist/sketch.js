@@ -1,4 +1,4 @@
-import { setupGameBFS } from "./main.js";
+import { Game, setupGame, setupGameBFS } from "./main.js";
 window.setup = setup;
 window.draw = draw;
 window.preload = preload;
@@ -42,6 +42,44 @@ function updateHTML() {
         targetElement.textContent = minMoves;
     if (seedElement)
         seedElement.textContent = currentSeed;
+}
+function setupMobileControls() {
+    const btnup = document.getElementById('btn-up');
+    const btndown = document.getElementById('btn-down');
+    const btnleft = document.getElementById('btn-left');
+    const btnright = document.getElementById('btn-right');
+    const btnundo = document.getElementById('btn-undo');
+    const btnreset = document.getElementById('btn-reset');
+    if (btnup) {
+        btnup.addEventListener('click', () => {
+            handleInput('up');
+        });
+    }
+    if (btndown) {
+        btndown.addEventListener('click', () => {
+            handleInput('down');
+        });
+    }
+    if (btnleft) {
+        btnleft.addEventListener('click', () => {
+            handleInput('left');
+        });
+    }
+    if (btnright) {
+        btnright.addEventListener('click', () => {
+            handleInput('right');
+        });
+    }
+    if (btnundo) {
+        btnundo.addEventListener('click', () => {
+            handleInput('undo');
+        });
+    }
+    if (btnreset) {
+        btnreset.addEventListener('click', () => {
+            handleInput('reset');
+        });
+    }
 }
 function setupSeedControls() {
     const seedButton = document.getElementById('seed-button');
@@ -103,6 +141,7 @@ function setup() {
     yAnchor = canvasSize / 2 - (spriteScale * ysize / 2);
     // Setup seed controls after DOM is ready
     setupSeedControls();
+    setupMobileControls();
     noLoop();
 }
 function place(sprname, x, y) {
@@ -186,6 +225,31 @@ function draw() {
         background(255);
     }
     noLoop();
+}
+function handleInput(input) {
+    switch (input) {
+        case 'up':
+            keyCode = UP_ARROW;
+            break;
+        case 'down':
+            keyCode = DOWN_ARROW;
+            break;
+        case 'left':
+            keyCode = LEFT_ARROW;
+            break;
+        case 'right':
+            keyCode = RIGHT_ARROW;
+            break;
+        case 'undo':
+            key = 'z';
+            break;
+        case 'reset':
+            key = 'r';
+            break;
+        default:
+            return;
+    }
+    keyPressed();
 }
 function keyPressed() {
     if (key === 'r') {
