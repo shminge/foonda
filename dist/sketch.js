@@ -1,4 +1,4 @@
-import { setupGameBFS } from "./main.js";
+import { Game, setupGame, setupGameBFS } from "./main.js";
 window.setup = setup;
 window.draw = draw;
 window.preload = preload;
