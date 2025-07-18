@@ -250,35 +250,36 @@ function draw() {
 }
 
 function handleInput(input) {
-    switch (input) {
-        case 'up':
-            keyCode = UP_ARROW;
-            key = '';
-            break;
-        case 'down':
-            keyCode = DOWN_ARROW;
-            key = '';
-            break;
-        case 'left':
-            keyCode = LEFT_ARROW;
-            key = '';
-            break;
-        case 'right':
-            keyCode = RIGHT_ARROW;
-            key = '';
-            break;
-        case 'undo':
-            key = 'z';
-            break;
-        case 'reset':
-            key = 'r';
-            break;
-        default:
-            return;
+    if (input === 'reset') {
+        game = undoStack[0].clone();
+        numMoves = 0;
+        updateHTML();
+        draw();
+        return;
     }
 
-    keyPressed();
+    if (input === 'undo') {
+        if (undoStack.length > 1) {
+            undoStack.pop();
+            game = undoStack[undoStack.length - 1].clone();
+            numMoves -= 1;
+            updateHTML();
+            draw();
+        }
+        return;
+    }
+
+    if (isMoving) return;
+
+    let gen = game.blobImpluse(input);
+    if (gen) {
+        numMoves += 1;
+        updateHTML();
+        isMoving = true;
+        animateMovement(gen);
+    }
 }
+
 
 
 
