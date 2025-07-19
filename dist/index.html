@@ -12,6 +12,7 @@
       margin: 0;
       padding: 0;
       background-color: #f0f0f0;
+      overflow-x: hidden;
     }
     
     /* Desktop styles */
@@ -31,8 +32,6 @@
         width: 500px;
         height: 500px;
       }
-      
-
     }
     
     /* Mobile styles */
@@ -42,6 +41,7 @@
         flex-direction: column;
         height: 100vh;
         padding: 8px;
+        box-sizing: border-box;
       }
       
       #game-container {
@@ -49,46 +49,50 @@
         display: flex;
         flex-direction: column;
         min-height: 0;
+        width: 100%;
+        box-sizing: border-box;
       }
       
       #canvas-container {
-        width: calc(100vw - 16px);
-        height: calc(100vw - 16px);
-        max-width: calc(100vh - 280px);
-        max-height: calc(100vh - 280px);
+        /* Calculate available space more conservatively */
+        width: min(calc(100vw - 20px), calc(100vh - 320px));
+        height: min(calc(100vw - 20px), calc(100vh - 320px));
         flex-shrink: 0;
+        margin: 0 auto;
+        box-sizing: border-box;
       }
       
       #controls {
         width: 100%;
         height: auto;
-        padding: 15px;
+        padding: 12px;
         margin-top: 8px;
         flex-shrink: 0;
+        box-sizing: border-box;
       }
       
       #game-info {
         margin-top: 8px;
-        padding: 12px;
-        font-size: 16px;
+        padding: 10px;
+        font-size: 14px;
         flex-shrink: 0;
       }
       
       #seed-controls {
         margin-top: 8px;
-        padding: 12px;
+        padding: 10px;
         flex-shrink: 0;
       }
       
       #seed-input {
-        width: 120px;
-        font-size: 14px;
-        padding: 6px 10px;
+        width: 100px;
+        font-size: 12px;
+        padding: 4px 8px;
       }
       
       #seed-button {
-        padding: 6px 12px;
-        font-size: 14px;
+        padding: 4px 8px;
+        font-size: 12px;
       }
     }
     
@@ -100,6 +104,16 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      box-sizing: border-box;
+    }
+    
+    /* Ensure canvas scales properly */
+    #canvas-container canvas {
+      max-width: 100% !important;
+      max-height: 100% !important;
+      width: auto !important;
+      height: auto !important;
+      display: block;
     }
     
     #controls {
@@ -109,6 +123,7 @@
       background-color: #8b8b8b;
       border-radius: 12px;
       box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      box-sizing: border-box;
     }
     
     /* Hide controls on desktop by default */
@@ -121,14 +136,15 @@
     /* D-Pad styles */
     #dpad {
       position: relative;
-      width: 130px;
-      height: 130px;
+      width: 110px;
+      height: 110px;
+      flex-shrink: 0;
     }
     
-    @media (max-width: 767px) {
+    @media (max-width: 400px) {
       #dpad {
-        width: 110px;
-        height: 110px;
+        width: 90px;
+        height: 90px;
       }
     }
     
@@ -157,43 +173,43 @@
     
     #btn-up {
       top: 0;
-      left: 45px;
+      left: 35px;
       width: 40px;
-      height: 40px;
+      height: 35px;
     }
     
     #btn-down {
       bottom: 0;
-      left: 45px;
+      left: 35px;
       width: 40px;
-      height: 40px;
+      height: 35px;
     }
     
     #btn-left {
-      top: 45px;
+      top: 37px;
       left: 0;
       width: 40px;
-      height: 40px;
+      height: 35px;
     }
     
     #btn-right {
-      top: 45px;
+      top: 37px;
       right: 0;
       width: 40px;
-      height: 40px;
+      height: 35px;
     }
     
-    @media (max-width: 767px) {
+    @media (max-width: 400px) {
       #btn-up, #btn-down {
-        left: 35px;
+        left: 25px;
         width: 40px;
-        height: 35px;
+        height: 30px;
       }
       
       #btn-left, #btn-right {
-        top: 37px;
+        top: 30px;
         width: 40px;
-        height: 35px;
+        height: 30px;
       }
       
       #btn-left {
@@ -208,25 +224,20 @@
     /* Action buttons */
     #action-buttons {
       display: flex;
-      gap: 25px;
+      gap: 12px;
       align-items: center;
-    }
-    
-    @media (max-width: 767px) {
-      #action-buttons {
-        gap: 15px;
-      }
+      flex-shrink: 0;
     }
     
     .action-btn {
-      width: 80px;
-      height: 80px;
+      width: 60px;
+      height: 60px;
       border-radius: 50%;
       background-color: #4a4a4a;
       border: 2px solid #333;
       color: white;
       font-weight: bold;
-      font-size: 12px;
+      font-size: 10px;
       cursor: pointer;
       transition: all 0.1s;
       user-select: none;
@@ -234,13 +245,14 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      flex-shrink: 0;
     }
     
-    @media (max-width: 767px) {
+    @media (max-width: 400px) {
       .action-btn {
-        width: 65px;
-        height: 65px;
-        font-size: 10px;
+        width: 50px;
+        height: 50px;
+        font-size: 8px;
       }
     }
     
@@ -257,10 +269,18 @@
       background-color: white;
       border-radius: 8px;
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      font-size: 18px;
+      font-size: 14px;
       text-align: center;
-      min-width: 200px;
-      padding: 15px;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+    
+    @media (min-width: 768px) {
+      #game-info {
+        font-size: 18px;
+        padding: 15px;
+        min-width: 200px;
+      }
     }
     
     .info-line {
@@ -272,22 +292,38 @@
       border-radius: 8px;
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
       text-align: center;
-      min-width: 200px;
-      padding: 15px;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+    
+    @media (min-width: 768px) {
+      #seed-controls {
+        padding: 15px;
+        min-width: 200px;
+      }
     }
     
     #seed-input {
-      padding: 8px 12px;
-      font-size: 16px;
+      padding: 4px 8px;
+      font-size: 12px;
       border: 2px solid #ddd;
       border-radius: 4px;
-      margin-right: 10px;
-      width: 150px;
+      margin-right: 8px;
+      box-sizing: border-box;
+    }
+    
+    @media (min-width: 768px) {
+      #seed-input {
+        padding: 8px 12px;
+        font-size: 16px;
+        width: 150px;
+        margin-right: 10px;
+      }
     }
     
     #seed-button {
-      padding: 8px 16px;
-      font-size: 16px;
+      padding: 4px 8px;
+      font-size: 12px;
       background-color: #4CAF50;
       color: white;
       border: none;
@@ -296,14 +332,29 @@
       transition: background-color 0.3s;
     }
     
+    @media (min-width: 768px) {
+      #seed-button {
+        padding: 8px 16px;
+        font-size: 16px;
+      }
+    }
+    
     #seed-button:hover {
       background-color: #45a049;
     }
     
     #current-seed {
-      margin-top: 10px;
-      font-size: 14px;
+      margin-top: 8px;
+      font-size: 12px;
       color: #666;
+      word-break: break-all;
+    }
+    
+    @media (min-width: 768px) {
+      #current-seed {
+        margin-top: 10px;
+        font-size: 14px;
+      }
     }
   </style>
 </head>
