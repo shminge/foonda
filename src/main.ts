@@ -228,6 +228,10 @@ export class Game {
                     }
                 }
 
+                if (moveTile.tile instanceof Hole && !moveTile.tile.filled) {
+                    return isBall;
+                }
+
 
                 if (!moveTile.tile || moveTile.tile.enterable(extDir)) {
                     if (moveTile.tile instanceof Slash || moveTile.tile instanceof Triangle) {
