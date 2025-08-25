@@ -329,7 +329,7 @@ export function createPuzzleBFS(n: number, m: number, rng: _RNG): [Cell[][], Vec
 
         console.log("Lowering threshold to " + maxDepth );
 
-        if (maxDepth <= 0) {
+        if (maxDepth <= 4) { //enforce at least 5 moves
             console.log("Failed, resetting")
             return createPuzzleBFS(n, m, rng) // fallback
         }
