@@ -236,5 +236,9 @@ export function createPuzzleBFS(n, m, rng) {
             return createPuzzleBFS(n, m, rng); // fallback
         }
     }
+    if (maxDepth <= 4) { //enforce at least 5 moves
+        console.log("Failed, resetting");
+        return createPuzzleBFS(n, m, rng); // fallback
+    }
     return [grid, startPos, exitPos, maxDepth];
 }
