@@ -249,10 +249,13 @@ function handleInput(input) {
         return;
     let gen = game.blobImpluse(input);
     if (gen) {
-        numMoves += 1;
-        updateHTML();
         isMoving = true;
+        let before = game.serializeGrid();
         animateMovement(gen);
+        if (before != game.serializeGrid()) {
+            numMoves += 1;
+            updateHTML();
+        }
     }
 }
 function keyPressed() {
