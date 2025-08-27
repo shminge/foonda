@@ -62,16 +62,16 @@ export class Game {
         return this.grid[p.x][p.y];
     }
 
-    displayGrid() {
+    static displayGrid(grid: Cell[][]) {
         let initial = '  ';
-        for (let x = 0; x < this.grid.length; x++) {
+        for (let x = 0; x < grid.length; x++) {
             initial += (x%10);
         }
         console.log(initial);
-        for (let y = 0; y < this.grid[0].length; y++) {
+        for (let y = 0; y < grid[0].length; y++) {
             let line = y + ' ';
-            for (let x = 0; x < this.grid.length; x++) {
-                let cCell: Cell = this.grid[x][y];
+            for (let x = 0; x < grid.length; x++) {
+                let cCell: Cell = grid[x][y];
                 line += cCell.entity?.render() ?? cCell.tile?.render() ?? '.' 
             }
             console.log(line)

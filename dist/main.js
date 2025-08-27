@@ -95,17 +95,17 @@ export class Game {
     getCell(p) {
         return this.grid[p.x][p.y];
     }
-    displayGrid() {
+    static displayGrid(grid) {
         var _a, _b, _c, _d;
         let initial = '  ';
-        for (let x = 0; x < this.grid.length; x++) {
+        for (let x = 0; x < grid.length; x++) {
             initial += (x % 10);
         }
         console.log(initial);
-        for (let y = 0; y < this.grid[0].length; y++) {
+        for (let y = 0; y < grid[0].length; y++) {
             let line = y + ' ';
-            for (let x = 0; x < this.grid.length; x++) {
-                let cCell = this.grid[x][y];
+            for (let x = 0; x < grid.length; x++) {
+                let cCell = grid[x][y];
                 line += (_d = (_b = (_a = cCell.entity) === null || _a === void 0 ? void 0 : _a.render()) !== null && _b !== void 0 ? _b : (_c = cCell.tile) === null || _c === void 0 ? void 0 : _c.render()) !== null && _d !== void 0 ? _d : '.';
             }
             console.log(line);
@@ -383,6 +383,7 @@ export function setupGameBFS(x, y, seed) {
             invalid = false;
         }
     }
+    Game.displayGrid(g.grid);
     return [g, depth];
 }
 //console.log("Get to the % in "+ nm + " moves!")
