@@ -335,6 +335,11 @@ export function createPuzzleBFS(n: number, m: number, rng: _RNG): [Cell[][], Vec
         }
     }
 
+    if (maxDepth <= 4) { //enforce at least 5 moves
+        console.log("Failed, resetting")
+        return createPuzzleBFS(n, m, rng) // fallback
+    }
+
     return [grid, startPos, exitPos!, maxDepth]
 
 }
