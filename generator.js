@@ -211,6 +211,10 @@ export function createPuzzleBFS(n, m, rng) {
             }
         }
     }
+    if (maxDepth <= 4) { //enforce at least 5 moves
+        console.log("Failed, to hit 5 moves, resetting");
+        return createPuzzleBFS(n, m, rng); // fallback
+    }
     let exitPos;
     while (!exitPos) {
         for (const [pos, data] of posMap) {
@@ -235,10 +239,6 @@ export function createPuzzleBFS(n, m, rng) {
             console.log("Failed, resetting");
             return createPuzzleBFS(n, m, rng); // fallback
         }
-    }
-    if (maxDepth <= 4) { //enforce at least 5 moves
-        console.log("Failed, resetting");
-        return createPuzzleBFS(n, m, rng); // fallback
     }
     return [grid, startPos, exitPos, maxDepth];
 }
