@@ -150,7 +150,7 @@ export function calcMin(grid, startPos, endPos) {
         }
     }
     console.log("Can't find a way on grid:");
-    Game.newGame(cloneGrid(grid), startPos).displayGrid();
+    Game.displayGrid(grid);
     throw new Error("Unreachable end position");
 }
 export function createPuzzleBFS(n, m, rng) {
@@ -183,29 +183,26 @@ export function createPuzzleBFS(n, m, rng) {
                 moved_past.push(gclone.blobPos);
             }
             let sg = gclone.serializeGrid();
-            if (seen.has(sg)) {
+            if (!seen.has(sg)) {
                 //console.log("Already seen")
-                continue;
-            }
-            else {
                 seen.set(sg, stackDepth + 1);
                 stack.push({
                     game: gclone,
                     depth: stackDepth + 1,
                     instructions: stackInstructions + _d
                 });
-                for (let pos of moved_past) {
-                    let moveData = posMap.get(JSON.stringify(pos));
-                    if (moveData) {
-                        if (stackDepth + 1 < moveData[0]) {
-                            posMap.set(JSON.stringify(pos), [stackDepth + 1, stackInstructions + _d]);
-                        }
-                    }
-                    else {
+            }
+            for (let pos of moved_past) {
+                let moveData = posMap.get(JSON.stringify(pos));
+                if (moveData) {
+                    if (stackDepth + 1 < moveData[0]) {
                         posMap.set(JSON.stringify(pos), [stackDepth + 1, stackInstructions + _d]);
-                        if (stackDepth + 1 > maxDepth) {
-                            maxDepth = stackDepth + 1;
-                        }
+                    }
+                }
+                else {
+                    posMap.set(JSON.stringify(pos), [stackDepth + 1, stackInstructions + _d]);
+                    if (stackDepth + 1 > maxDepth) {
+                        maxDepth = stackDepth + 1;
                     }
                 }
             }
