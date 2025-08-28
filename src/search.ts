@@ -22,7 +22,7 @@ function quickDepth(x: number, y: number, seed: string) {
 function searchDepth(x: number, y: number, c: number) {
     let m = 0;
         while (c--) {
-        let seed = Math.round(Math.random()*10000000).toString();
+        let seed = Math.round(Math.random()*100000000000000).toString();
         let d = suppressConsoleLogs(() => quickDepth(x, y, seed));
 
         if (d >= m) {
