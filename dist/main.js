@@ -383,7 +383,6 @@ export function setupGameBFS(x, y, seed) {
             invalid = false;
         }
     }
-    Game.displayGrid(g.grid);
     return [g, depth];
 }
 //console.log("Get to the % in "+ nm + " moves!")

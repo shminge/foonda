@@ -191,8 +191,6 @@ export function createPuzzleBFS(n, m, rng) {
                     depth: stackDepth + 1,
                     instructions: stackInstructions + _d
                 });
-                console.log("Enqueue:", dir, "Depth:", stackDepth + 1, "Blob:", gclone.blobPos.x, gclone.blobPos.y);
-                console.log("Serialize key:", gclone.serializeGrid() + `@${gclone.blobPos.x},${gclone.blobPos.y}`);
             }
             for (let pos of moved_past) {
                 let moveData = posMap.get(JSON.stringify(pos));
@@ -215,9 +213,6 @@ export function createPuzzleBFS(n, m, rng) {
         return createPuzzleBFS(n, m, rng); // fallback
     }
     let exitPos;
-    for (const [pos, data] of posMap) {
-        console.log("Candidate pos:", pos, "Depth:", data[0], "Instructions:", data[1]);
-    }
     while (!exitPos) {
         for (const [pos, data] of posMap) {
             if (data[0] >= maxDepth) {
