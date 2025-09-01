@@ -101,7 +101,7 @@ export function createPuzzle(n, m, rng) {
     let moves = [];
     for (let i = 0; i < numMoves; i++) {
         let dir = rng.choice(["up", "down", "left", "right"]);
-        const gen = g.blobImpluse(dir);
+        const gen = g.blobImpulse(dir);
         exhaust(gen);
         moves.push(dir);
     }
@@ -109,7 +109,7 @@ export function createPuzzle(n, m, rng) {
     let possEnds = [g.blobPos];
     let dir = rng.choice(["up", "down", "left", "right"]);
     moves.push(dir);
-    const gen = g.blobImpluse(dir);
+    const gen = g.blobImpulse(dir);
     for (const _ of gen) {
         possEnds.push(g.blobPos);
     }
@@ -128,7 +128,7 @@ export function calcMin(grid, startPos, endPos) {
         let [position, numMoves] = stack.pop();
         for (let dir of directions) {
             let gclone = position.clone();
-            const gen = gclone.blobImpluse(dir);
+            const gen = gclone.blobImpulse(dir);
             //exhaust(gen);
             for (const _ of gen) {
                 if (vEq(gclone.blobPos, endPos))
@@ -174,7 +174,7 @@ export function createPuzzleBFS(n, m, rng) {
         let stackInstructions = stackInstance.instructions;
         for (let dir of directions) {
             let gclone = stackGame.clone();
-            let gen = gclone.blobImpluse(dir);
+            let gen = gclone.blobImpulse(dir);
             let _d = dir[0].toUpperCase();
             //exhaust(gen);
             // we need to track all the visited positions, including while moving

@@ -132,7 +132,7 @@ export class Game {
      * Push the blobChar in the specified direction, modifying the grid along the way.
      * @param dir the direction blob is being pushed
      */
-    *blobImpluse(dir: Direction): Generator<void, void, void> {
+    *blobImpulse(dir: Direction): Generator<void, void, void> {
         while (true) {
             let nextPos = directionStep(this.blobPos, dir);
             let nextCell = this.getCell(nextPos);
@@ -172,7 +172,7 @@ export class Game {
                             this.moveBlob(nextPos);
                             let extD = nextCell.tile.exitDir(dir);
                             nextCell.tile.rotate();
-                            yield* this.blobImpluse(extD);
+                            yield* this.blobImpulse(extD);
                             return;
                         } else {
                             return;
@@ -361,7 +361,7 @@ export class Game {
                     promptInput(1);
                     return;
                 } else if (validDirections.includes(input as Direction)) {
-                    const gen = playInstance.blobImpluse(input as Direction);
+                    const gen = playInstance.blobImpulse(input as Direction);
                     for (const _ of gen) {
                         playInstance.displayGrid();
                         console.log();
@@ -477,7 +477,7 @@ let actions: Direction[] = ["down", "right", "up", "right", "left", "left", "dow
 for (let a of actions) {
     console.log("Moving " + a);
 
-    const gen = g.blobImpluse(a);
+    const gen = g.blobImpulse(a);
     for (let _ of gen) {
         g.displayGrid(); // display each step
         console.log();

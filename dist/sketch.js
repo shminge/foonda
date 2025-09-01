@@ -247,7 +247,7 @@ function handleInput(input) {
     }
     if (isMoving)
         return;
-    let gen = game.blobImpluse(input);
+    let gen = game.blobImpulse(input);
     if (gen) {
         isMoving = true;
         let before = game.serializeGrid();

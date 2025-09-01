@@ -114,7 +114,7 @@ export function createPuzzle(n: number, m: number, rng: _RNG): [Cell[][], Vec2, 
     for (let i = 0; i < numMoves; i++) {
         let dir: Direction = rng.choice(["up", "down", "left", "right"]);
 
-        const gen = g.blobImpluse(dir);
+        const gen = g.blobImpulse(dir);
         
         exhaust(gen);
 
@@ -126,7 +126,7 @@ export function createPuzzle(n: number, m: number, rng: _RNG): [Cell[][], Vec2, 
     let dir: Direction = rng.choice(["up", "down", "left", "right"]);
     moves.push(dir);
 
-    const gen = g.blobImpluse(dir);
+    const gen = g.blobImpulse(dir);
     
     for (const _ of gen) {
         possEnds.push(g.blobPos);
@@ -156,7 +156,7 @@ export function calcMin(grid: Cell[][], startPos: Vec2, endPos: Vec2): number {
         for (let dir of directions) {
 
             let gclone = position.clone();
-            const gen = gclone.blobImpluse(dir);
+            const gen = gclone.blobImpulse(dir);
 
             //exhaust(gen);
 
@@ -253,7 +253,7 @@ export function createPuzzleBFS(n: number, m: number, rng: _RNG): [Cell[][], Vec
 
         for (let dir of directions) {
             let gclone = stackGame!.clone();
-            let gen = gclone.blobImpluse(dir);
+            let gen = gclone.blobImpulse(dir);
             let _d = dir[0].toUpperCase();
 
             //exhaust(gen);
