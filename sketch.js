@@ -247,13 +247,12 @@ function handleInput(input) {
     }
     if (isMoving)
         return;
-    let gen = game.blobImpluse(input);
+    let gen = game.blobImpulse(input);
     if (gen) {
         isMoving = true;
         let before = game.serializeGrid();
         animateMovement(gen);
         if (before != game.serializeGrid()) {
-            undoStack.push(game.clone());
             numMoves += 1;
             updateHTML();
         }
@@ -290,5 +289,6 @@ function animateMovement(generator) {
     }
     else {
         isMoving = false;
+        undoStack.push(game.clone());
     }
 }
