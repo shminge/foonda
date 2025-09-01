@@ -253,7 +253,6 @@ function handleInput(input) {
         let before = game.serializeGrid();
         animateMovement(gen);
         if (before != game.serializeGrid()) {
-            undoStack.push(game.clone());
             numMoves += 1;
             updateHTML();
         }
@@ -290,5 +289,6 @@ function animateMovement(generator) {
     }
     else {
         isMoving = false;
+        undoStack.push(game.clone());
     }
 }
