@@ -275,16 +275,18 @@ function handleInput(input) {
     let gen = game.blobImpulse(input);
     if (gen) {
         isMoving = true;
-        let before = game.serializeGrid();
-        animateMovement(gen);
-        if (before != game.serializeGrid()) {
-            numMoves += 1;
-            updateHTML();
-        }
+        let before = game.clone();
+        animateMovement(gen, before);
     }
 }
 
-
+function updateMoves(b, g){
+    if (b.serializeGrid() != g.serializeGrid()) {
+        numMoves += 1;
+        updateHTML();
+        undoStack.push(g.clone())
+    }
+}
 
 
 function keyPressed() {
@@ -311,16 +313,16 @@ function keyPressed() {
     }
 }
 
-function animateMovement(generator) {
+function animateMovement(generator, before) {
     const result = generator.next();
     if (!result.done) {
         drawChecker();
         drawGame();
         // Add delay before next frame (300ms = 0.3 seconds)
-        setTimeout(() => animateMovement(generator), 1);
+        setTimeout(() => animateMovement(generator, before), 1);
     } else {
         isMoving = false;
-        undoStack.push(game.clone())
+        updateMoves(before, game)
     }
 }
 
