@@ -101,10 +101,18 @@ function setupSeedControls() {
         });
     }
 }
+function getGenerationOptions() {
+    const ids = ["opt-w", "opt-b", "opt-t", "opt-s", "opt-h", "opt-g"];
+    return ids.map(id => {
+        const el = document.getElementById(id);
+        return el && el.checked ? 1 : 0;
+    });
+}
 function loadNewGame(seed = null) {
     console.log("Loading new game");
     currentSeed = seed || getTodaysDate();
-    [game, minMoves] = setupGameBFS(xsize, ysize, currentSeed);
+    let options = getGenerationOptions();
+    [game, minMoves] = setupGameBFS(xsize, ysize, currentSeed, options);
     undoStack = [];
     undoStack.push(game.clone());
     numMoves = 0;
