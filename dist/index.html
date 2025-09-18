@@ -125,7 +125,29 @@
       box-shadow: 0 4px 8px rgba(0,0,0,0.2);
       box-sizing: border-box;
     }
-    
+
+    details.options {
+      margin-top: 10px;
+      padding: 6px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      background-color: #fafafa;
+    }
+
+    details.options summary {
+      cursor: pointer;
+      font-weight: bold;
+      outline: none;
+    }
+
+    details.options .options-list {
+      margin-top: 8px;
+      display: grid;
+      grid-template-columns: 1fr 1fr; /* 2 columns */
+      grid-template-rows: repeat(3, auto); /* 3 rows */
+      gap: 6px 12px; /* row gap, column gap */
+    }
+
     /* Hide controls on desktop by default */
     @media (min-width: 768px) {
       #controls {
@@ -387,6 +409,18 @@
         <button id="seed-button">New Game</button>
       </div>
       <div id="current-seed">Current seed: <span id="seed-display">loading...</span></div>
+
+      <details class="options">
+        <summary>Generation Options</summary>
+        <div class="options-list">
+          <label><input type="checkbox" id="opt-w" checked> Walls</label>
+          <label><input type="checkbox" id="opt-b" checked> Balls</label>
+          <label><input type="checkbox" id="opt-t" checked> Triangles</label>
+          <label><input type="checkbox" id="opt-s" checked> Slashes</label>
+          <label><input type="checkbox" id="opt-h" checked> Holes</label>
+          <label><input type="checkbox" id="opt-g" checked> Grates</label>
+        </div>
+      </details>
     </div>
   </div>
 

@@ -422,7 +422,7 @@ export function setupGame(x:number, y:number, difficulty: string, seed: string):
 }
 
 
-export function setupGameBFS(x: number, y: number, seed: string) {
+export function setupGameBFS(x: number, y: number, seed: string, options: number[] = [1,1,1,1,1,1]) {
 
     let rng = new _RNG(seed);
 
@@ -436,7 +436,7 @@ export function setupGameBFS(x: number, y: number, seed: string) {
 
     while (invalid) {
 
-        [grid, startPos, endPos, depth] = createPuzzleBFS(x, y, rng);
+        [grid, startPos, endPos, depth] = createPuzzleBFS(x, y, rng, options);
         
         g = Game.newGame(grid, startPos);
         if (g.grid[endPos.x][endPos.y].tile) {

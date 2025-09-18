@@ -49,16 +49,20 @@ function emptyTiles(g: Cell[][]): Vec2[] {
     return empty;
 }
 
-export function generateGrid(n: number, m: number, rng: _RNG, minDensity: number = 0.05, maxDensity: number = 0.2): [Cell[][], Vec2] {
+export function generateGrid(n: number, m: number, rng: _RNG, options: number[] = [1,1,1,1,1,1], minDensity: number = 0.05, maxDensity: number = 0.2): [Cell[][], Vec2] {
     let g = Game.emptyGrid(n, m);
     let elemCount = rng.rand(minDensity, maxDensity) * (n - 1) * (m - 1);
     let empty = emptySpaces(g);
     empty = rng.shuffleArray(empty);
+    let tileChoices: number[] = [];
+    options.forEach((val, idx) => {
+    if (val === 1) tileChoices.push(idx);
+  });
     for (let i = 0; i < elemCount; i++) {
         let spot = empty.pop();
         if (spot) {
             let cell: Cell = {};
-            let q = rng.choice([0, 1, 2, 3, 4, 5])
+            let q = rng.choice(tileChoices)
             switch (q) {
                 case 0:
                     cell.tile = new Wall();
@@ -225,8 +229,8 @@ export function backstep(g: Cell[][], bPos: Vec2): PuzzleStack[] {
 type BFSEntry = {game: Game, depth: number, instructions: string}
 
 
-export function createPuzzleBFS(n: number, m: number, rng: _RNG): [Cell[][], Vec2, Vec2, number] {
-    let [grid, startPos] = generateGrid(n, m, rng); 
+export function createPuzzleBFS(n: number, m: number, rng: _RNG, options: number[] = [1,1,1,1,1,1]): [Cell[][], Vec2, Vec2, number] {
+    let [grid, startPos] = generateGrid(n, m, rng, options); 
 
     let possTargets = emptyTiles(grid);
 

@@ -363,7 +363,7 @@ export function setupGame(x, y, difficulty, seed) {
     ng[0].grid[g[2].x][g[2].y].tile = new Star;
     return ng;
 }
-export function setupGameBFS(x, y, seed) {
+export function setupGameBFS(x, y, seed, options = [1, 1, 1, 1, 1, 1]) {
     let rng = new _RNG(seed);
     let invalid = true;
     let grid;
@@ -372,7 +372,7 @@ export function setupGameBFS(x, y, seed) {
     let depth;
     let g;
     while (invalid) {
-        [grid, startPos, endPos, depth] = createPuzzleBFS(x, y, rng);
+        [grid, startPos, endPos, depth] = createPuzzleBFS(x, y, rng, options);
         g = Game.newGame(grid, startPos);
         if (g.grid[endPos.x][endPos.y].tile) {
             console.log('Botched setup. Restarting...');

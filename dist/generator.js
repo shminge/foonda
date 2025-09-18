@@ -41,16 +41,21 @@ function emptyTiles(g) {
     }
     return empty;
 }
-export function generateGrid(n, m, rng, minDensity = 0.05, maxDensity = 0.2) {
+export function generateGrid(n, m, rng, options = [1, 1, 1, 1, 1, 1], minDensity = 0.05, maxDensity = 0.2) {
     let g = Game.emptyGrid(n, m);
     let elemCount = rng.rand(minDensity, maxDensity) * (n - 1) * (m - 1);
     let empty = emptySpaces(g);
     empty = rng.shuffleArray(empty);
+    let tileChoices = [];
+    options.forEach((val, idx) => {
+        if (val === 1)
+            tileChoices.push(idx);
+    });
     for (let i = 0; i < elemCount; i++) {
         let spot = empty.pop();
         if (spot) {
             let cell = {};
-            let q = rng.choice([0, 1, 2, 3, 4, 5]);
+            let q = rng.choice(tileChoices);
             switch (q) {
                 case 0:
                     cell.tile = new Wall();
@@ -153,9 +158,9 @@ export function calcMin(grid, startPos, endPos) {
     Game.displayGrid(grid);
     throw new Error("Unreachable end position");
 }
-export function createPuzzleBFS(n, m, rng) {
+export function createPuzzleBFS(n, m, rng, options = [1, 1, 1, 1, 1, 1]) {
     var _a;
-    let [grid, startPos] = generateGrid(n, m, rng);
+    let [grid, startPos] = generateGrid(n, m, rng, options);
     let possTargets = emptyTiles(grid);
     const directions = ["up", "down", "left", "right"];
     let stack = [];

@@ -19,14 +19,37 @@ function quickDepth(x: number, y: number, seed: string) {
 
 }
 
+function exists(thing: Object) {
+    return Object.keys(thing).length != 0
+}
+
+function quickDiff(x: number, y: number, seed: string) {
+
+    let rng = new _RNG(seed);
+
+    let invalid = true;
+
+    let grid;
+    let startPos;
+    let endPos;
+    let depth;
+    let g;
+
+    [grid, startPos, endPos, depth] = createPuzzleBFS(x, y, rng);
+    let count = grid.flat().filter(exists).length-36;
+
+    return depth - count;
+
+}
+
 function searchDepth(x: number, y: number, c: number) {
     let m = 0;
         while (c--) {
         let seed = Math.round(Math.random()*100000000000000).toString();
-        let d = suppressConsoleLogs(() => quickDepth(x, y, seed));
+        let d = suppressConsoleLogs(() => quickDiff(x, y, seed));
 
         if (d >= m) {
-            console.log(`Seed ${seed} has depth ${d}`)
+            console.log(`Seed ${seed} has diff ${d}`)
             m = d;
         }
 
