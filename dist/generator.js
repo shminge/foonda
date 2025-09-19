@@ -215,7 +215,7 @@ export function createPuzzleBFS(n, m, rng, options = [1, 1, 1, 1, 1, 1]) {
     }
     if (maxDepth <= 4) { //enforce at least 5 moves
         console.log("Failed, to hit 5 moves, resetting");
-        return createPuzzleBFS(n, m, rng); // fallback
+        return createPuzzleBFS(n, m, rng, options); // fallback
     }
     let exitPos;
     while (!exitPos) {
